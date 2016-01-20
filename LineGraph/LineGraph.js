@@ -107,18 +107,18 @@ visualizationFunctions.LineGraph = function(element, data, opts) {
 			})
 			.interpolate("monotone");
 
-		var tip = d3.tip()
-			.attr("class", "d3-tip")
-			.offset([0, 0])
-			.html(function(d) {
-				var str = "";
-				Object.keys(d).forEach(function(d1, i1) {
-					str += "<strong>" + d1 + ":</strong> <span style='color:red'>" + d[d1] + "</span></br>"
-				})
-				return str;
-			})
+		// var tip = d3.tip()
+		// 	.attr("class", "d3-tip")
+		// 	.offset([0, 0])
+		// 	.html(function(d) {
+		// 		var str = "";
+		// 		Object.keys(d).forEach(function(d1, i1) {
+		// 			str += "<strong>" + d1 + ":</strong> <span style='color:red'>" + d[d1] + "</span></br>"
+		// 		})
+		// 		return str;
+		// 	})
 
-		network.SVG.call(tip);
+		// network.SVG.call(tip);
 
 		// network.SVG.dataCircles = network.SVG.selectAll("dataCircles")
 		// 	.data(nestedData)
