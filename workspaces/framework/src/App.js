@@ -1,6 +1,5 @@
 //http://www.ng-newsletter.com/posts/directives.html 
 var app = angular.module('app', [])
-
 var globalScope;
 var verbose = false;
 //TODO: KNOWN ISSUES

@@ -48,15 +48,15 @@ module.exports = function(grunt) {
 					// 'git init',
 					// 'git config core.sparseCheckout true',
 					// 'echo ' + grunt.option('project') + '/*>> .git/info/sparse-checkout',
-					// 'git remote add -f origin git://github.com/Simpsoah/Project-Test.git',
+					// 'git remote add -f origin git@github.iu.edu:adhsimps/CNS-Framework-TestProject.git',
 					// 'git fetch origin ' + (grunt.option('commit') || 'master'),
 					// 'git reset --hard FETCH_HEAD'
 					'mkdir ' + grunt.option('project'),
 					'cd ' + grunt.option('project'),
 					'git init',
-					'git config core.sparseCheckout true',
-					'echo ' + grunt.option('project') + '/*>> .git/info/sparse-checkout',
-					'git remote add -f origin git://github.com/Simpsoah/Project-Test.git',
+					// 'git config core.sparseCheckout true',
+					// 'echo ' + grunt.option('project') + '/*>> .git/info/sparse-checkout',
+					'git remote add -f origin git@github.iu.edu:adhsimps/CNS-Framework-TestProject.git',
 					'git fetch origin ' + (grunt.option('commit') || 'master'),
 					'git reset --hard FETCH_HEAD'
 
@@ -86,8 +86,8 @@ module.exports = function(grunt) {
 					'mkdir ' + grunt.option('project'),
 					'cd ' + grunt.option('project'),
 					'git init',
-					'git remote add -f origin git://github.com/Simpsoah/Project-Test.git',
-					'mkdir ' + grunt.option('project')
+					'git remote add -f origin git@github.iu.edu:adhsimps/CNS-Framework-TestProject.git',
+					// 'mkdir ' + grunt.option('project')
 				].join('&&')
 			}
 		},
@@ -128,11 +128,11 @@ module.exports = function(grunt) {
 				expand: true,
 				cwd: 'workspaces/framework',
 				src: ['**/*', '!lib/*', '!src/*', 'src/tmp/', 'src/DatasourceMap.js'],
-				dest: 'workspaces/projects/' + grunt.option('project') + '/' + grunt.option('project') + '/',
+				dest: 'workspaces/projects/' + grunt.option('project') + '/',
 			},
 			project: {
 				expand: true,
-				cwd: 'workspaces/projects' + grunt.option('project') + '/' + grunt.option('project'),
+				cwd: 'workspaces/projects/' + grunt.option('project') + '/',
 				src: ['**/*'],
 				dest: ('deploy/' + grunt.option('project')),
 			},
@@ -149,7 +149,7 @@ module.exports = function(grunt) {
 				expand: true,
 				// cwd: 'visualizations-workspace/' + grunt.option('vis') + '/' + grunt.option('vis'),
 				src: ['templates/generatedVisContent/*'],
-				dest: 'workspaces/projects/' + grunt.option('project') + '/' + grunt.option('project') + '/visuals',
+				dest: 'workspaces/projects/' + grunt.option('project') + '/visuals',
 				rename: function(dest, srcPath) {
 					return dest + '/' + srcPath.replace(/\bVISALIAS\b/g, grunt.option('alias'));
 				},
@@ -327,7 +327,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('watchboth', ['watchproj', 'watchvis']);
 	grunt.registerTask('build-project-files', ['shell:initproject']);
 	grunt.registerTask('build-project-visualizations', function() {
-		var obj = grunt.file.readJSON('workspaces/projects/' + grunt.option('project') + '/' + grunt.option('project') + '/visuals/visincludes.json');
+		var obj = grunt.file.readJSON('workspaces/projects/' + grunt.option('project') + '/visuals/visincludes.json');
 		grunt.config.data.shell.makeprojdir = {
 			command: 'mkdir ' + grunt.option('project'),
 			options: {
@@ -347,7 +347,7 @@ module.exports = function(grunt) {
 					'git init',
 					'git config core.sparseCheckout true',
 					'echo ' + obj.data[d].visualization + '/*>> .git/info/sparse-checkout',
-					'git remote add -f origin git://github.com/Simpsoah/Visualizations-Test.git',
+					'git remote add -f origin git@github.iu.edu:adhsimps/CNS-Framework-Plugins.git',
 					'git fetch origin ' + obj.data[d].commit || 'master',
 					'git reset --hard FETCH_HEAD'
 				].join('&&'),
@@ -364,18 +364,30 @@ module.exports = function(grunt) {
 	grunt.registerTask('fetch-proj-files', ['clean:project', 'build-project-files']);
 	grunt.registerTask('fetch-proj-visuals', ['clean:visualization', 'build-project-visualizations']);
 	grunt.registerTask('build-framework', 'Clean the directory and copy the framework code to the deployment directory.', ['clean:deploy', 'copy:framework']);
+	//TODO: Why does this no longer work?!
 	grunt.registerTask('fetch-project', 'Fetch the project code from the remote repository, read the visIncludes.json file and fetch the corresponding visualizations. ' ['fetch-proj-files', 'fetch-proj-visuals']);
 	grunt.registerTask('register-deploy-scripts', ['folder_list']);
 	// grunt clean-workspace
-	grunt.registerTask('clean-workspace', 'Cleans the damn workspace', ['clean:projects', 'clean:visualizations', 'clean:deploys', 'mkdir:workspace']);
+	grunt.registerTask('clean-workspace', 'Cleans the workspace', ['clean:projects', 'clean:visualizations', 'clean:deploys', 'mkdir:workspace']);
 	// grunt create-project --project=Project1
 	grunt.registerTask('create-project', ['clean:project', 'shell:createproject', 'copy:framework2']);
 	// grunt create-vis-config --project=Project1 --vis=SampleVis --alias=sampleVis01 
 	grunt.registerTask('create-vis-config', ['copy:vistemplate']);
 	// grunt build-project-full --project=Project1
-	grunt.registerTask('build-project-full', ['build-framework', 'fetch-project', 'copy:project', 'copy:flatten', 'register-deploy-scripts']);
+	grunt.registerTask('build-project-full', ['build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:flatten', 'register-deploy-scripts']);
 	// grunt build-project --project=Project1
 	grunt.registerTask('build-project', ['copy:project', 'copy:flatten', 'register-deploy-scripts']);
 	// grunt webserver
 	grunt.registerTask('webserver', ['web_server']);
 };
+/*
+
+
+grunt build-framework --project=i2b2
+grunt fetch-proj-files --project=i2b2
+grunt fetch-proj-visuals --project=i2b2
+grunt copy:project --project=i2b2
+grunt copy:flatten --project=i2b2
+grunt register-deploy-scripts --project=i2b2
+
+*/

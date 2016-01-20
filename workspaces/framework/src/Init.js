@@ -1,8 +1,9 @@
 //Head loads scripts in parellel, but executes them in order.
 var visualizations = {};
 var visualizationFunctions = {};
-var Events = {};
-var Configs = {};
+var events = {};
+var configs = {};
+var meta = {};
 function AJAX_JSON_Req(url) {
 	var ajaxRequest = new XMLHttpRequest();
 	ajaxRequest.open("GET", url, true);
