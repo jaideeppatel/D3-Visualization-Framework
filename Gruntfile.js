@@ -48,7 +48,7 @@ module.exports = function(grunt) {
 					// 'git init',
 					// 'git config core.sparseCheckout true',
 					// 'echo ' + grunt.option('project') + '/*>> .git/info/sparse-checkout',
-					// 'git remote add -f origin git@github.iu.edu:adhsimps/CNS-Framework-TestProject.git',
+					// 'git remote add -f origin ' + grunt.option('projectrepo'),
 					// 'git fetch origin ' + (grunt.option('commit') || 'master'),
 					// 'git reset --hard FETCH_HEAD'
 					'mkdir ' + grunt.option('project'),
@@ -56,7 +56,7 @@ module.exports = function(grunt) {
 					'git init',
 					// 'git config core.sparseCheckout true',
 					// 'echo ' + grunt.option('project') + '/*>> .git/info/sparse-checkout',
-					'git remote add -f origin git@github.iu.edu:adhsimps/CNS-Framework-TestProject.git',
+					'git remote add -f origin ' + grunt.option('projectrepo'),
 					'git fetch origin ' + (grunt.option('commit') || 'master'),
 					'git reset --hard FETCH_HEAD'
 
@@ -86,7 +86,7 @@ module.exports = function(grunt) {
 					'mkdir ' + grunt.option('project'),
 					'cd ' + grunt.option('project'),
 					'git init',
-					'git remote add -f origin git@github.iu.edu:adhsimps/CNS-Framework-TestProject.git',
+					'git remote add -f origin ' + grunt.option('projectrepo'),
 					// 'mkdir ' + grunt.option('project')
 				].join('&&')
 			}
@@ -392,5 +392,5 @@ grunt register-deploy-scripts --project=i2b2
 
 */
 
-// git@github.iu.edu:adhsimps/CNS-Framework-TestProject.git
-// git@github.iu.edu:adhsimps/CNS-Framework-Project-IAI-Phase2.git
+// 
+ // + grunt.option('projectrepo')// git@github.iu.edu:adhsimps/CNS-Framework-Project-IAI-Phase2.git
