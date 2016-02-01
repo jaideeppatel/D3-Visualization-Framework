@@ -1,0 +1,5 @@
+var globalDatasourceMap = {
+    name: {
+        url: ''
+    },
+}
