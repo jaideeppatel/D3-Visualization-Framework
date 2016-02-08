@@ -59,7 +59,6 @@ module.exports = function(grunt) {
 					'git remote add -f origin ' + grunt.option('projectrepo'),
 					'git fetch origin ' + (grunt.option('commit') || 'master'),
 					'git reset --hard FETCH_HEAD'
-
 				].join('&&'),
 				options: {
 					execOptions: {
@@ -118,6 +117,12 @@ module.exports = function(grunt) {
 		},
 		//Copies src directory to dest
 		copy: {
+			backupdeploy: {
+				expand: true,
+				cwd: 'deploy/',
+				src: ['**/*'],
+				dest: ('backup-deploy/'),
+			},
 			framework: {
 				expand: true,
 				cwd: 'workspaces/framework',
@@ -261,7 +266,7 @@ module.exports = function(grunt) {
 							if (['create-project', 'register-deploy-scripts', 'build-project', 'build-project-full'].indexOf(answers.tasklist) > -1) {
 								return true;
 							}
-							return false;							
+							return false;
 						}
 					}, {
 						config: 'dangerconfirm',
@@ -283,14 +288,38 @@ module.exports = function(grunt) {
 					then: function(answers) {
 						console.log("asdf")
 						console.log(grunt.config)
-							grunt.option('project') = answers.projectinput
+						grunt.option('project') = answers.projectinput
 
 						if (answers.dangerconfirm != false) {
 							grunt.task.run(answers.tasklist);
 						}
 					}
 				}
+			},
+			visConfig02: {
+				options: {
+					questions: [{
+						config: 'visConfig01',
+						type: 'checkbox',
+						message: 'Select all of the config options you would like or create a new config:',
+						choices: ['Circles', 'Rectangles', 'Edges', 'Labels', 'Table', 'Custom'],
+						validate: function(value) {
+							return true;
+						}, // return true if valid, error message if invalid. works only with type:input 
+						filter: function(value) {
+							return value;
+						},
+						when: function(answers) {
+							console.log(answers);
+							if (answers) {
+								return true;
+							}
+							return false;
+						}
+					}]
+				}
 			}
+
 		},
 		mkdir: {
 			workspace: {
@@ -301,30 +330,97 @@ module.exports = function(grunt) {
 		},
 		availabletasks: {
 			tasks: {}
+		},
+		jsdoc: {
+			dist: {
+				src: ['deploy/**/*.js', '!deploy/**/lib/*.js'],
+				options: {
+					destination: 'doc',
+					// template : 'node_modules/ink-docstrap/template',
+					// configure : 'node_modules/ink-docstrap/template/jsdoc.conf.json'
+
+				}
+			}
 		}
 	}
 
 	grunt.loadTasks('tasks');
-	grunt.loadNpmTasks('grunt-shell');
-	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-jslint');
-	grunt.loadNpmTasks("grunt-jsbeautifier");
-	grunt.loadNpmTasks('grunt-folder-list');
-	grunt.loadNpmTasks('grunt-web-server');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-newer');
-	grunt.loadNpmTasks('grunt-prompt');
-	grunt.loadNpmTasks('grunt-mkdir');
-	grunt.loadNpmTasks('grunt-available-tasks');
+
+
+	//Load all tasks in array
+	['grunt-jsdoc', 'grunt-peon-gui', 'grunt-shell', 'grunt-contrib-copy', 'grunt-contrib-clean', 'grunt-contrib-jshint', 'grunt-contrib-watch', 'grunt-jslint', 'grunt-jsbeautifier', 'grunt-folder-list', 'grunt-web-server', 'grunt-contrib-watch', 'grunt-newer', 'grunt-prompt', 'grunt-mkdir', 'grunt-available-tasks']
+	.forEach(function(d) {
+		grunt.loadNpmTasks(d);
+	});
 	// grunt.util._.extend(config, loadConfig('./tasks/lib/'));
 	grunt.initConfig(config);
-	console.log(grunt.option('project'))
-	grunt.registerTask('watchproj', ['watch:project', 'watch:main']);
-	grunt.registerTask('watchvis', ['watch:visualizations']);
-	grunt.registerTask('watchboth', ['watchproj', 'watchvis']);
+
+
+
+	// var visAttrs = {
+	// 	radius: {
+	// 		radius: [0,1]
+	// 	},
+	// 	width: {
+	// 		width: [0,1]
+	// 	},
+	// 	height: {
+	// 		height: [0,1]
+	// 	},		
+	// 	shapeStyle: {
+	// 		fill: {
+	// 			opacity: 1,
+	// 			fill: "#000000"
+
+	// 		},
+	// 		stroke: {
+	// 			strokeWidth: 0,
+	// 			stroke: "#000000"
+	// 		}
+	// 	},
+	// 	text: {
+	// 		fontSize: [12,12],
+	// 		format: {
+	// 			pretty: 'Attr',
+	// 			format: '' // currency | date | uppercase ...
+	// 		}
+	// 	},
+	// 	table: {
+	// 		attributes: [{
+	// 			prettyLabel: 'Attr',
+	// 			format: '' // currency | date | UPPERCASE ...
+	// 		}],
+	// 		pagination: 5,
+	// 		globalSearch: false,
+	// 		removeRow: false
+	// 	}
+	// }
+	// var visConfig = {
+	// 	nodes: {
+	// 		radius: visAttrs.radius,
+	// 		style: visAttrs.shapeStyle,
+	// 		labels: visAttrs.text
+	// 	}, 
+	// 	bars: {
+	// 		width: visAttrs.width,
+	// 		height: visAttrs.height,
+	// 		style: visAttrs.shapeStyle,
+	// 		labels: visAttrs.text
+	// 	},
+	// 	labels: visAttrs.text,
+	// 	edges: visAttrs.shapeStle,
+	// 	table: visAttrs.table
+	// }
+
+	// grunt.registerTask('isgood', function() {
+
+	// })
+
+
+
+	grunt.registerTask('watch-proj', ['watch:project', 'watch:main']);
+	grunt.registerTask('watch-vis', ['watch:visualizations']);
+	grunt.registerTask('watch-proj-and-vis', ['watch-proj', 'watch-vis']);
 	grunt.registerTask('build-project-files', ['shell:initproject']);
 	grunt.registerTask('build-project-visualizations', function() {
 		var obj = grunt.file.readJSON('workspaces/projects/' + grunt.option('project') + '/visuals/visincludes.json');
@@ -369,7 +465,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('register-deploy-scripts', ['folder_list']);
 	// grunt clean-workspace
 	grunt.registerTask('clean-workspace', 'Cleans the workspace', ['clean:projects', 'clean:visualizations', 'clean:deploys', 'mkdir:workspace']);
-	// grunt create-project --project=Project1
+	// grunt create-project --project=Project1 --projectrepo=C:\Users\simps_000\Desktop\CNS-Framework-Base\workspaces\projects\Project1
 	grunt.registerTask('create-project', ['clean:project', 'shell:createproject', 'copy:framework2']);
 	// grunt create-vis-config --project=Project1 --vis=SampleVis --alias=sampleVis01 
 	grunt.registerTask('create-vis-config', ['copy:vistemplate']);
@@ -378,7 +474,7 @@ module.exports = function(grunt) {
 	// grunt build-project --project=Project1
 	grunt.registerTask('build-project', ['copy:project', 'copy:flatten', 'register-deploy-scripts']);
 	// grunt webserver
-	grunt.registerTask('webserver', ['web_server']);
+	grunt.registerTask('webserver', ['web_server', 'open:deploy']);
 };
 /*
 
@@ -393,4 +489,4 @@ grunt register-deploy-scripts --project=i2b2
 */
 
 // 
- // + grunt.option('projectrepo')// git@github.iu.edu:adhsimps/CNS-Framework-Project-IAI-Phase2.git
+// + grunt.option('projectrepo')// git@github.iu.edu:adhsimps/CNS-Framework-Project-IAI-Phase2.git
