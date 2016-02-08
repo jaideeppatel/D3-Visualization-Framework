@@ -1,50 +1,88 @@
-//http://www.ng-newsletter.com/posts/directives.html 
+
+/**
+ * @namespace  app
+ * @type {Object}
+ * @description Angular app. Binds events to Angular DOM elements. 
+ */
 var app = angular.module('app', ['smart-table'])
-var globalScope;
-var verbose = false;
-//TODO: KNOWN ISSUES
-//	- Toggling physics off, then dragging an element turns physics back on. This doesn't reregister properly though. 
-//		So to turn physics off again, the button in the debug bar needs to be clicked twice
-//	- The tolerance slider doesn't reset so the values slip out of range if you change the node size attribute
+
+
 app.service('Data', ['$rootScope', '$http', function($rootScope, $http) {
+    /**
+     * @namespace  service
+     * @memberOf  app
+     * @description Angular service. Provides global data binding tools.
+     * @property mapDatasource {@link globalDatasourceMap}
+     * @property {Array} dataQueue Collection of unique URL strings. Used to prevent duplicate data loading from the same URL.
+     * @property {Function} addToDataQueue {@link app.addToDataQueue}
+     * @property {Function} retrieveData {@link app.retrieveData}
+     * @property {Function} getData {@link app.getData}
+     * @property {Function} getAllData {@link app.getAllData}
+     */
     var service = {
-        mapDatasource: globalDatasourceMap,
-        dataQueue: [],
-        //TODO: Test this
-        addToDataQueue: function(s) {
-            if (this.dataQueue.indexOf(s) < 0) {
-                this.dataQueue.push(s);
+            mapDatasource: globalDatasourceMap,
+            dataQueue: [],
+            //TODO: Test this
+            /**
+             * @memberOf app
+             * @function addToDataQueue
+             * @description Adds URL string to {@link dataQueue} if it doesn't already exist.
+             * @param {String} s URL string.
+             */
+            addToDataQueue: function(s) {
+                if (this.dataQueue.indexOf(s) < 0) {
+                    this.dataQueue.push(s);
+                }
+            },
+            /**
+             * @memberOf app
+             * @function retrieveData
+             * @description Performs an $http GET request on the specified URL, then calls the callback function upon completion.
+             * @param {String} datasource URL string.
+             * @param {String} cb Callback function after the $http request has completed.
+             */
+            retrieveData: function(datasource, cb) {
+                if (datasource) {
+                    if (verbose) console.log("Getting " + datasource + " data...");
+                    $http({
+                        method: 'GET',
+                        url: this.mapDatasource[datasource].url
+                    }).then(function(res) {
+                        if (verbose) console.log("Got " + datasource + " data!");
+                        cb(res);
+                    });
+                }
+            },
+            /**
+             * @memberOf app
+             * @function getData
+             * @description Calls {@link app.retrieveData} with specified callback that broadcasts to all visualization listeners that the data has been retrieved.
+             * @param {String} datasource URL string.
+             * @returns {Object} Data of GET request.
+             */
+            getData: function(datasource) {
+                var that = this;
+                this.retrieveData(datasource, function(res) {
+                    that.mapDatasource[datasource].data = res.data;
+                    if (verbose) console.log("Broadcasting: " + datasource + " updated.");
+                    $rootScope.$broadcast(datasource + '.update', res.data);
+                    that.mapDatasource[datasource].dataPrepared = true;
+                    return res.data;
+                })
+            },
+            /**
+             * @memberOf app
+             * @function getAllData
+             * @description Calls {@link app.getData} on all queued sources.
+             */
+            getAllData: function() {
+                var that = this;
+                this.dataQueue.forEach(function(d, i) {
+                    that.getData(d);
+                })
             }
-        },
-        retrieveData: function(datasource, cb) {
-            if (datasource) {
-                if (verbose) console.log("Getting " + datasource + " data...");
-                $http({
-                    method: 'GET',
-                    url: this.mapDatasource[datasource].url
-                }).then(function(res) {
-                    if (verbose) console.log("Got " + datasource + " data!");
-                    cb(res);
-                });
-            }
-        },
-        getData: function(datasource) {
-            var that = this;
-            this.retrieveData(datasource, function(res) {
-                that.mapDatasource[datasource].data = res.data;
-                if (verbose) console.log("Broadcasting: " + datasource + " updated.");
-                $rootScope.$broadcast(datasource + '.update', res.data);
-                that.mapDatasource[datasource].dataPrepared = true;
-                return res.data;
-            })
-        },
-        getAllData: function() {
-            var that = this;
-            this.dataQueue.forEach(function(d, i) {
-                that.getData(d);
-            })
         }
-    }
+        //Maps attributes before processing. 
     Object.keys(service.mapDatasource).map(function(d, i) {
         service.mapDatasource[d].data = {};
         service.mapDatasource[d].dataPrepared = false;
@@ -54,10 +92,32 @@ app.service('Data', ['$rootScope', '$http', function($rootScope, $http) {
 
 
 app.directive('ngCnsVisual', ['$rootScope', 'Data', function($rootScope, Data) {
+    /**
+     * @namespace  ngCnsVisual
+     * @memberOf  app
+     * @description Angular directive. Binds visualization functions and data to Angular DOM elements.
+     * @property {Function} link {@link app.link}
+     */
     return {
         restrict: "A",
         controller: ['$scope', '$http', function($scope, $http) {}],
+        /**
+         * @memberOf app
+         * @object link
+         * @description Functions ran before and after DOM binding. 
+         * @property {Object} pre {@link app.pre}
+         * @property {Object} post {@link app.post}
+         */
         link: {
+            /**
+             * @memberOf app
+             * @function pre
+             * @description Creates new visualization class, stores visualization class and instance, and prepares instance. Adds Angular listeners and broadcasters. If the visualization has the (ng-component-for) attribute, it will listen for the parent to be ready. If the visualization is a parent, it will broadcast it's completion to all component listeners.
+             * @param {Object} scope Angular scope.
+             * @param {Object} elem Angular DOM element.
+             * @param {Object} attrs Angular attributes from DOM.
+             * @param {Object} ctrl Angular controller.
+             */
             pre: function(scope, elem, attrs, ctrl) {
                 if (verbose) console.log("Visual pre link for: " + attrs.ngIdentifier);
                 Data.addToDataQueue(attrs.ngDataField);
@@ -74,6 +134,15 @@ app.directive('ngCnsVisual', ['$rootScope', 'Data', function($rootScope, Data) {
                     $rootScope.$broadcast(attrs.ngIdentifier + '.created')
                 }
             },
+            /**
+             * @memberOf app
+             * @function post
+             * @description Adds listeners to elements with the (ng-data-field) attribute. If the data changes, trigger an update to each visualization instance listener.
+             * @param {Object} scope Angular scope.
+             * @param {Object} elem Angular DOM element.
+             * @param {Object} attrs Angular attributes from DOM.
+             * @param {Object} ctrl Angular controller.
+             */
             post: function(scope, elem, attrs, ctrl) {
                 if (verbose) console.log("Visual post link for: " + attrs.ngIdentifier);
                 if (attrs.ngDataField) {
@@ -93,6 +162,11 @@ app.directive('ngCnsVisual', ['$rootScope', 'Data', function($rootScope, Data) {
 }])
 
 app.directive('ngCnsVisRunner', ['$rootScope', '$timeout', 'Data', function($rootScope, $timeout, Data) {
+    /**
+     * @namespace  ngCnsVisRunner
+     * @memberOf  app
+     * @description Angular directive. Surrounds all {@link app.ngCnsVisual} to allow for synchronous operations. Gets data after all visualizations have been bound. 
+     */    
     return {
         restrict: "A",
         controller: ['$scope', '$http', function($scope, $http) {
@@ -114,6 +188,7 @@ app.directive('ngCnsVisRunner', ['$rootScope', '$timeout', 'Data', function($roo
         }
     }
 }]);
+
 app.controller("basicCtrl", ["$scope", function($scope) {
     $scope.rowCollection = [];
     $scope.setrowCollection = function(d) {
@@ -123,14 +198,51 @@ app.controller("basicCtrl", ["$scope", function($scope) {
     $scope.setitemsByPage = function(d) {
         $scope.itemsByPage = d;
     }
-    $scope.itemsByPage = 10
+    $scope.itemsByPage = 10;
     $scope.removeItem = function removeItem(row) {
         var index = $scope.rowCollection.indexOf(row);
         if (index !== -1) {
             $scope.rowCollection.splice(index, 1);
         }
-    }    
+    }
+    $scope.$watch(function() {
+        console.log("Digesting!")
+    });
+
+    $scope.filter = function(val) {
+        val = val || ''
+        $scope.displayedCollection = [];
+        $scope.rowCollection.forEach(function(d, i) {
+            var include = false;
+            Object.keys(d).forEach(function(d1, i1) {
+                if (d[d1].toString().indexOf(val.toString()) >= 0) {
+                    include = true;
+                }
+            })
+            if (include) {
+                $scope.displayedCollection.push(d)
+            }
+        })
+    }
+
+    // $scope.pipeFunction = function(tableState, ctrl) {
+    //     console.log(tableState)
+    // if (!$scope.stCtrl && ctrl) {
+    //     $scope.stCtrl = ctrl;
+    // }
+
+    // if (!tableState && $scope.stCtrl) {
+    //     $scope.stCtrl.pipe();
+    //     return;
+    // }
+    // console.log(tableState)
+    // tableState.start = tableState.pagination.start || 0;
+    // tableState.number = tableState.pagination.number || 10;
+
+    // get data
+    // }
 }]);
+
 angular.element(document).ready(function() {
     angular.bootstrap(document, ['app']);
 })
