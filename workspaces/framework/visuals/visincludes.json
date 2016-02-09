@@ -1,10 +1,10 @@
 {
 	"data": {
-		/* "VISNAME": {
-			"visualization": "VISNAME",
+		 "HeatMap": {
+			"visualization": "HeatMap",
 			"alias": "visName",
 			"commit": ""
 		
-		}*/
+		}
 	},
 }
