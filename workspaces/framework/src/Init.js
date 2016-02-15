@@ -98,6 +98,8 @@ var verbose = false;
     }, {
         "ProportionalSymbol.js": "visuals/ProportionalSymbol.js"
     }, {
+        "BarGraphDistort.js": "visuals/BarGraphDistort.js"
+    }, {
         "tableController.js": "visuals/tableController.js"
     }, {
         "underlyingStateData.js": "visuals/underlyingStateData.js"
