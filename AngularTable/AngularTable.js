@@ -76,7 +76,7 @@ visualizationFunctions.AngularTable = function(element, data, opts) {
 
 			network.applyFilter = function(val) {
 				$rootScope.$apply(function() {
-					$('#' + opts.ngIdentifier + '-table').scope().filter(val);
+					angular.element('#' + opts.ngIdentifier + '-table').scope().filter(val);
 					// $('#' + opts.ngIdentifier + '-table').scope().$apply();
 				})
 			}
