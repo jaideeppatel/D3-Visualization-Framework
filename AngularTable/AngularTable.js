@@ -69,7 +69,7 @@ visualizationFunctions.AngularTable = function(element, data, opts) {
 			$(container).html($compile(string)($rootScope));
 			$(element).append(container);
 			$rootScope.$apply(function() {
-				$rootScope.$$childHead.setrowCollection(network.AngularArgs.data.get("records").data);
+				$rootScope.$$childHead.setrowCollection(network.filteredData.records.data);
 				$rootScope.$$childHead.setitemsByPage(network.config.meta.table.pagination)
 			});
 
