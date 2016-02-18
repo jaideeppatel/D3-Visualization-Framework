@@ -3,34 +3,9 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 	network.parentVis = visualizations[opts.ngComponentFor];
 	network.config = network.CreateBaseConfig();
 	network.VisFunc = function() {
-		var useData = network.GetData()[network.PrimaryDataAttr].data;
-		if (!opts.ngDataField) {
-			useData = network.parentVis.GetData()[network.parentVis.PrimaryDataAttr].data;
-			network.Scales = network.parentVis.Scales;
-			if (!network.config.meta) {
-				network.config.meta = network.parentVis.config.meta	
-			}
-		}
-		var tempCat1 = ["a", "b", "c", "d"];
-		var tempCat2 = ["1", "2", "3", "4"];
-		useData.map(function(d, i) {
-			d.cat1 = tempCat1[Math.floor(Math.random() * 4)];
-			d.cat2 = tempCat2[Math.floor(Math.random() * 4)];
-		});
+		var data = network.AngularArgs.data.get("records");
 
-		network.AngularArgs.data.edges = {};
-		network.AngularArgs.data.edges.data = [];		
-		for (var i = 0; i < 100; i++) {
-			var obj = {};
-			var randS = Math.floor(Math.random() * useData.length);
-			var randT = Math.floor(Math.random() * useData.length);
-			obj.index = i;
-			obj.source = randS;
-			obj.target = randT;
-			network.AngularArgs.data.edges.data.push(obj);
-		}
-
-		var categories = ["cat1", "cat2", "ipREGION"];
+		var categories = ['lat'];
 		var categoryBank = {};
 
 		categories.forEach(function(category) {
@@ -38,7 +13,7 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 				.key(function(d) { return d[category]; })
 				.rollup(function(leaves) { 
 					var obj = {children:leaves};
-					network.GetData()[network.PrimaryDataAttr].schema.forEach(function(d) {
+					data.schema.forEach(function(d) {
 						if (d.type == "numeric") {
 							obj[d.name] = d3.mean(leaves, function(d1) {
 								return d1[d.name];
@@ -47,15 +22,14 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 					})
 					return obj;
 				})
-				.entries(useData);
+				.entries(data.data);
 		})
-
 		network.leaflet = network.config.easyLeafletMap(element[0], {
 			worldCopyJump: true,
 			minZoom: 2,
 			maxZoom: 8,
 			center: [39, -98],
-			zoom: 5,
+			zoom: 3,
 			closePopupOnClick: true
 		}, "http://{s}.tile.openstreetmap.org").addInteractionLayer().addTileLayer();
 		network.leaflet.map._initPathRoot();
@@ -65,32 +39,34 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 
 		var circ = network.SVG.append("circle")
 			.attr("r", 12)
-			.attr("fill", "red")
 
-		var rScale = d3.scale.linear()
-			.domain([
-				d3.min(categoryBank.ipREGION, function(d) { return d.values.Count}),
-				d3.max(categoryBank.ipREGION, function(d) { return d.values.Count})])
-			.range([2, 12])
+		// var network.Scales.rScale = d3.scale.linear()
+		// 	.domain([
+		// 		d3.min(categoryBank.ipREGION, function(d) { return d.values.Count}),
+		// 		d3.max(categoryBank.ipREGION, function(d) { return d.values.Count})])
+		// 	.range([2, 12])
 		
+		network.Scales.rScale = d3.scale.linear()
+			.domain([0,100])
+			.range([2, 12])
+
 		network.SVG.nodes = network.SVG.selectAll(".circle")
-			.data(categoryBank.ipREGION)
+			.data(categoryBank.lat)
 			.enter()
 			.append("circle")
 			.attr("class", function(d, i) {
-				console.log(d.index);
-				return "id" + d.index
+				return "id" + i
 			})
 			.attr("r", function(d, i) {
-				return rScale(d.values.Count)
+				return 12;
+				// network.Scales.rScale(d.values.val)
 			})
-			.attr("fill", "#FF0000")
-		network.SVG.edges = network.SVG.selectAll(".path")
-			.data(network.AngularArgs.data.edges.data)
-			.enter()
-			.append("path")
-			.attr("stroke", "#FF0000")
-			.attr("stroke-width", "#FF0000")
+		// network.SVG.edges = network.SVG.selectAll(".path")
+		// 	.data(network.AngularArgs.data.edges.data)
+		// 	.enter()
+		// 	.append("path")
+		// 	.attr("stroke", "#FF0000")
+		// 	.attr("stroke-width", "#FF0000")
 
 		update();
 
@@ -98,16 +74,22 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 			network.SVG.nodes
 				.attr("transform", function(d, i) {
 					var l1= network.leaflet.map.latLngToLayerPoint({
-						"lat": d.values.Latitude || 0,
-						"lng": d.values.Longitude || 0
+						"lat": d.values.lat || 0,
+						"lng": d.values.lng || 0
 					});
 					var x = l1.x;
 					var y = l1.y;
 					return "translate(" + x + "," + y + ")";
 				}).on("click", function(d) {
+					d.popupContent = [];
+					network.config.meta.nodes.popup.forEach(function(d1, i1) {
+						l = d1.prettyLabel;
+						d.popupContent.push({l: d.values[d1.attr]})
+					})
+					console.log(d.popupContent)
 					var popup = L.marker(network.leaflet.map.layerPointToLatLng(network.leaflet.map.latLngToLayerPoint({
-						"lat": d.values.Latitude || 0,
-						"lng": d.values.Longitude || 0
+						"lat": d.values.lat || 0,
+						"lng": d.values.lng || 0
 					})), {
 						icon: new network.leaflet.marker({
 							options: {
@@ -117,7 +99,7 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 								popupAnchor: [0, 0]
 							}
 						})
-					}).addTo(network.leaflet.map).bindPopup("HAHA, I'M ADAM");
+					}).addTo(network.leaflet.map).bindPopup('<div class="popup-content"></div>');
 					setTimeout(function() {
 						popup.openPopup();
 					}, 1);					
