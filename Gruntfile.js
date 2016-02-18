@@ -21,8 +21,8 @@ module.exports = function(grunt) {
         // projectrepo: '',
         // visualizationsrepo: '',
         // frameworkrepo: '',
-        project: grunt.option('project'),
-        alias: grunt.option('alias'),
+        // project: '<%= projectName %>',
+        alias: '<%= visualizationAlias %>',
         pkg: grunt.file.readJSON('package.json'),
         // vis: grunt.file.readJSON('visincludes.json'),
         web_server: {
@@ -47,21 +47,21 @@ module.exports = function(grunt) {
             //TODO: This might change to a full checkout from an exclusive repo so clients cannot bleed into other projects
             initproject: {
                 command: [
-                    // 'mkdir ' + grunt.option('project'),
-                    // 'cd ' + grunt.option('project'),
+                    // 'mkdir ' + '<%= projectName %>',
+                    // 'cd ' + '<%= projectName %>',
                     // 'git init',
                     // 'git config core.sparseCheckout true',
-                    // 'echo ' + grunt.option('project') + '/*>> .git/info/sparse-checkout',
-                    // 'git remote add -f origin ' + grunt.option('projectrepo'),
-                    // 'git fetch origin ' + (grunt.option('commit') || 'master'),
+                    // 'echo ' + '<%= projectName %>' + '/*>> .git/info/sparse-checkout',
+                    // 'git remote add -f origin ' + '<%= projectURL %>',
+                    // 'git fetch origin ' + ('<%= commitID %>' || 'master'),
                     // 'git reset --hard FETCH_HEAD'
-                    'mkdir ' + grunt.option('project'),
-                    'cd ' + grunt.option('project'),
+                    ('mkdir ' + '<%= projectName %>'),
+                    ('cd ' + '<%= projectName %>'),
                     'git init',
                     // 'git config core.sparseCheckout true',
-                    // 'echo ' + grunt.option('project') + '/*>> .git/info/sparse-checkout',
-                    'git remote add -f origin ' + grunt.option('projectrepo'),
-                    'git fetch origin ' + (grunt.option('commit') || 'master'),
+                    // 'echo ' + '<%= projectName %>' + '/*>> .git/info/sparse-checkout',
+                    'git remote add -f origin ' + '<%= projectURL %>',
+                    'git fetch origin ' + ('<%= commitID %>' || 'master'),
                     'git reset --hard FETCH_HEAD'
                 ].join('&&'),
                 options: {
@@ -87,12 +87,12 @@ module.exports = function(grunt) {
                 },
                 command: [
                     //TODO: If projectrepo options is not specified, ignore
-                    'mkdir ' + grunt.option('project'),
-                    'cd ' + grunt.option('project'),
+                    ('mkdir ' + '<%= projectName %>'),
+                    ('cd ' + '<%= projectName %>'),
                     'git init',
-                    // if (grunt.option('projectrepo')
-                    'git remote add -f origin ' + (grunt.option('projectrepo'))
-                    // 'mkdir ' + grunt.option('project')
+                    // if ('<%= projectURL %>'
+                    'git remote add -f origin ' + ('<%= projectURL %>')
+                    // 'mkdir ' + '<%= projectName %>'
                 ].join('&&')
             }
         },
@@ -107,19 +107,19 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     src: ['**/*.js', '**/*.json', '**/*.css'],
-                    dest: ('deploy/' + grunt.option('project') + '/src/tmp/includes.json'),
-                    cwd: ('deploy/' + grunt.option('project') + '/')
+                    dest: ('deploy/' + '<%= projectName %>' + '/src/tmp/includes.json'),
+                    cwd: ('deploy/' + '<%= projectName %>' + '/')
                 }]
             },
         },
         // Deletes specified folders.
         clean: {
             deploys: ['deploy/'],
-            deploy: ['deploy/' + grunt.option('project')],
+            deploy: [('deploy/' + '<%= projectName %>')],
             projects: ['workspaces/projects'],
-            project: ['workspaces/projects/' + grunt.option('project')],
+            project: [('workspaces/projects/' + '<%= projectName %>')],
             visualizations: ['workspaces/visualizations/'],
-            visualization: ['workspaces/visualizations/' + grunt.option('vis')]
+            visualization: ['workspaces/visualizations/' + '<%= visualizationName %>']
         },
         //Copies src directory to dest
         copy: {
@@ -134,48 +134,48 @@ module.exports = function(grunt) {
                 expand: true,
                 cwd: 'workspaces/framework',
                 src: ['**/*'],
-                dest: ('deploy/' + grunt.option('project')),
+                dest: ('deploy/' + '<%= projectName %>'),
             },
             //TODO: Change name
             framework2: {
                 expand: true,
                 cwd: 'workspaces/framework',
                 src: ['**/*', '!lib/*', '!src/*', 'src/tmp/', 'src/DatasourceMap.js'],
-                dest: 'workspaces/projects/' + grunt.option('project') + '/',
+                dest: ('workspaces/projects/' + '<%= projectName %>' + '/'),
             },
             project: {
                 expand: true,
-                cwd: 'workspaces/projects/' + grunt.option('project') + '/',
+                cwd: ('workspaces/projects/' + '<%= projectName %>' + '/'),
                 src: ['**/*'],
-                dest: ('deploy/' + grunt.option('project')),
+                dest: ('deploy/' + '<%= projectName %>'),
             },
             //Copies src files to dest (flattens directories)
-            //TODO: Change name			
+            //TODO: Change name         
             flatten: {
                 expand: true,
                 cwd: 'workspaces/visualizations',
                 src: ['**/*.js', '**/*.json', '!**/visincludes.json', '!**/*-config.js'],
-                dest: ('deploy/' + grunt.option('project') + '/visuals'),
+                dest: ('deploy/' + '<%= projectName %>' + '/visuals'),
                 flatten: true
             },
             //Copies templates and replaces placeholders with paramater values 
             vistemplate: {
                 expand: true,
-                // cwd: 'visualizations-workspace/' + grunt.option('vis') + '/' + grunt.option('vis'),
+                // cwd: 'visualizations-workspace/' + '<%= visualizationName %>' + '/' + '<%= visualizationName %>',
                 src: ['templates/generatedVisContent/*'],
-                dest: 'workspaces/projects/' + grunt.option('project') + '/visuals',
+                dest: ('workspaces/projects/' + '<%= projectName %>' + '/visuals'),
                 rename: function(dest, srcPath) {
-                    return dest + '/' + srcPath.replace(/\bVISALIAS\b/g, grunt.option('alias'));
+                    return dest + '/' + srcPath.replace(/\bVISALIAS\b/g, '<%= visualizationAlias %>');
                 },
                 options: {
                     process: function(content, srcpath) {
                         var cont = content;
-                        cont = cont.replace(/\bVISALIASALT\b/g, grunt.option('alias')
+                        cont = cont.replace(/\bVISALIASALT\b/g, '<%= visualizationAlias %>'
                             .replace(/(?:^|\.?)([A-Z])/g, function(x, y) {
                                 return "_" + y.toLowerCase();
                             }).replace(/^_/, ""));
-                        cont = cont.replace(/\bVISALIAS\b/g, grunt.option('alias'));
-                        cont = cont.replace(/\bVISNAME\b/g, grunt.option('vis'));
+                        cont = cont.replace(/\bVISALIAS\b/g, '<%= visualizationAlias %>');
+                        cont = cont.replace(/\bVISNAME\b/g, '<%= visualizationName %>');
                         return cont;
                     },
                 },
@@ -185,17 +185,17 @@ module.exports = function(grunt) {
             watchcopyproject: {
                 expand: true,
                 dot: true,
-                cwd: 'workspaces/projects/' + grunt.option('project'),
+                cwd: ('workspaces/projects/' + '<%= projectName %>'),
                 src: ['**/*.*', '!.git/'],
-                dest: 'deploy/' + grunt.option('project')
+                dest: ('deploy/' + '<%= projectName %>')
             },
             watchcopyvisualizations: {
                 expand: true,
                 dot: true,
-                cwd: 'workspaces/visualizations/' + grunt.option('project'),
+                cwd: ('workspaces/visualizations/' + '<%= projectName %>'),
                 src: ['**/*.*', '!.git/'],
                 //TODO: This doesn't point to the correct location .Fix and test.
-                dest: 'deploy/' + grunt.option('project') + '/visuals',
+                dest: ('deploy/' + '<%= projectName %>' + '/visuals'),
                 flatten: true
             }
         },
@@ -208,7 +208,7 @@ module.exports = function(grunt) {
                 options: {
                     //nospawn is depricated but kept for compatibility.  use spawn false instead
                     spawn: false,
-                    cwd: 'workspaces/projects/' + grunt.option('project'),
+                    cwd: ('workspaces/projects/' + '<%= projectName %>'),
                     livereload: true
                 },
             },
@@ -216,19 +216,22 @@ module.exports = function(grunt) {
                 files: ['**/*.*'],
                 tasks: ['newer:copy:watchcopyvisualizations'],
                 options: {
-                    //nospawn is depricated but kept for compatibility.  use spawn false instead
                     spawn: false,
-                    cwd: 'workspaces/visualizations/' + grunt.option('project'),
+                    //TODO: Probably needs a matching structure to do this. 
+                    cwd: ('workspaces/visualizations/' + '<%= projectName %>'),
                 },
             },
             main: {
                 files: ['**/*.*'],
                 options: {
-                    cwd: 'deploy/' + grunt.option('project'),
+                    cwd: ('deploy/' + '<%= projectName %>'),
                     livereload: true
                 },
             },
         },
+
+
+
         prompt: {
             tasks: {
                 options: {
@@ -297,7 +300,7 @@ module.exports = function(grunt) {
                         },
                     }],
                     then: function(answers) {
-                        grunt.option('project') = answers.projectinput
+                        // '<%= projectName %>' = answers.configval
 
                         if (answers.dangerconfirm != false) {
                             grunt.task.run(answers.tasklist);
@@ -305,30 +308,84 @@ module.exports = function(grunt) {
                     }
                 }
             },
-            visConfig02: {
+
+            visualizationname: {
                 options: {
                     questions: [{
-                        config: 'visConfig01',
-                        type: 'checkbox',
-                        message: 'Select all of the config options you would like or create a new config:',
-                        choices: ['Circles', 'Rectangles', 'Edges', 'Labels', 'Table', 'Custom'],
-                        validate: function(value) {
-                            return true;
-                        }, // return true if valid, error message if invalid. works only with type:input 
-                        filter: function(value) {
-                            return value;
-                        },
-                        when: function(answers) {
-                            console.log(answers);
-                            if (answers) {
-                                return true;
-                            }
-                            return false;
-                        }
-                    }]
+                        config: 'visualizationName',
+                        type: 'input',
+                        message: 'Please enter the visualization name (Same as top level folder in repository):',
+                    }],
+                    then: function() {
+                    }
+                }
+            },
+            commitid: {
+                options: {
+                    questions: [{
+                        config: 'commitID',
+                        type: 'input',
+                        message: 'Please enter the commit id:',
+                    }],
+                    then: function() {
+                    }
+                }
+            },
+            visualizationalias: {
+                options: {
+                    questions: [{
+                        config: 'visualizationAlias',
+                        type: 'input',
+                        message: 'Please enter the visualization alias (Should be unique to prevent issues):',
+                    }],
+                    then: function() {
+                    }
+                }
+            },
+            projectname: {
+                options: {
+                    questions: [{
+                        config: 'projectName',
+                        type: 'input',
+                        message: 'Please enter the project name (alias):',
+                    }],
+                    then: function() {
+                    }
+                }
+            },
+            baserepo: {
+                options: {
+                    questions: [{
+                        config: 'baseURL',
+                        type: 'input',
+                        message: 'Please enter the framework base repo URL:',
+                    }],
+                    then: function() {
+                    }
+                }
+            },
+            pluginsrepo: {
+                options: {
+                    questions: [{
+                        config: 'pluginsURL',
+                        type: 'input',
+                        message: 'Please enter the plugins repo URL:',
+                    }],
+                    then: function() {
+                    }
+                }
+            },
+            projectrepo: {
+                options: {
+                    questions: [{
+                        config: 'projectURL',
+                        type: 'input',
+                        message: 'Please enter the project repo URL:',
+                    }],
+                    then: function() {
+                    }
                 }
             }
-
         },
         mkdir: {
             workspace: {
@@ -336,9 +393,6 @@ module.exports = function(grunt) {
                     create: ['deploy', 'workspaces/projects', 'workspaces/visualizations']
                 },
             },
-        },
-        availabletasks: {
-            tasks: {}
         },
         jsdoc: {
             dist: {
@@ -351,112 +405,26 @@ module.exports = function(grunt) {
                 }
             }
         },
-        convertExcelToJson: {
-            dist: {
-                files: [{
-                    src: 'SourceAndPrelims/' + grunt.option('src') + '.xlsx',
-                    dst: 'output/' + grunt.option('src') + '.json',
-                    isColOriented: false
-                }]
-            },
-        },
-        compress: {
-            deploy: {
-                options: {
-                    archive: 'archive.zip'
-                },
-                files: [
-                    {
-                        src: ['deploy/' + grunt.option('project') + '/**'],
-                        dest: ''
-                    }
-                ]
-            }
-        }
     }
 
     grunt.loadTasks('tasks');
 
-
     //Load all tasks in array
-    ['grunt-contrib-compress', 'grunt-excel-as-json', 'grunt-jsdoc', 'grunt-peon-gui', 'grunt-shell', 'grunt-contrib-copy', 'grunt-contrib-clean', 'grunt-contrib-jshint', 'grunt-contrib-watch', 'grunt-jslint', 'grunt-jsbeautifier', 'grunt-folder-list', 'grunt-web-server', 'grunt-contrib-watch', 'grunt-newer', 'grunt-prompt', 'grunt-mkdir', 'grunt-available-tasks']
+    ['grunt-jsdoc', 'grunt-peon-gui', 'grunt-shell', 'grunt-contrib-copy', 'grunt-contrib-clean', 'grunt-contrib-jshint', 'grunt-contrib-watch', 'grunt-jslint', 'grunt-jsbeautifier', 'grunt-folder-list', 'grunt-web-server', 'grunt-contrib-watch', 'grunt-newer', 'grunt-prompt', 'grunt-mkdir', 'grunt-available-tasks']
     .forEach(function(d) {
         grunt.loadNpmTasks(d);
     });
     // grunt.util._.extend(config, loadConfig('./tasks/lib/'));
     grunt.initConfig(config);
 
-
-
-    // var visAttrs = {
-    // 	radius: {
-    // 		radius: [0,1]
-    // 	},
-    // 	width: {
-    // 		width: [0,1]
-    // 	},
-    // 	height: {
-    // 		height: [0,1]
-    // 	},		
-    // 	shapeStyle: {
-    // 		fill: {
-    // 			opacity: 1,
-    // 			fill: "#000000"
-
-    // 		},
-    // 		stroke: {
-    // 			strokeWidth: 0,
-    // 			stroke: "#000000"
-    // 		}
-    // 	},
-    // 	text: {
-    // 		fontSize: [12,12],
-    // 		format: {
-    // 			pretty: 'Attr',
-    // 			format: '' // currency | date | uppercase ...
-    // 		}
-    // 	},
-    // 	table: {
-    // 		attributes: [{
-    // 			prettyLabel: 'Attr',
-    // 			format: '' // currency | date | UPPERCASE ...
-    // 		}],
-    // 		pagination: 5,
-    // 		globalSearch: false,
-    // 		removeRow: false
-    // 	}
-    // }
-    // var visConfig = {
-    // 	nodes: {
-    // 		radius: visAttrs.radius,
-    // 		style: visAttrs.shapeStyle,
-    // 		labels: visAttrs.text
-    // 	}, 
-    // 	bars: {
-    // 		width: visAttrs.width,
-    // 		height: visAttrs.height,
-    // 		style: visAttrs.shapeStyle,
-    // 		labels: visAttrs.text
-    // 	},
-    // 	labels: visAttrs.text,
-    // 	edges: visAttrs.shapeStle,
-    // 	table: visAttrs.table
-    // }
-
-    // grunt.registerTask('isgood', function() {
-
-    // })
-
-
-
     grunt.registerTask('watch-proj', ['watch:project', 'watch:main']);
     grunt.registerTask('watch-vis', ['watch:visualizations']);
     grunt.registerTask('watch-proj-and-vis', ['watch-proj', 'watch-vis']);
     grunt.registerTask('build-project-files', ['shell:initproject']);
     grunt.registerTask('build-project-visualizations', function() {
-        var obj = grunt.file.readJSON('workspaces/projects/' + grunt.option('project') + '/visuals/visincludes.json');
+        var obj = grunt.file.readJSON(('workspaces/projects/' + '<%= projectName %>' + '/visuals/visincludes.json'));
         grunt.config.data.shell.makeprojdir = {
-            command: 'mkdir ' + grunt.option('project'),
+            command: ('mkdir ' + '<%= projectName %>'),
             options: {
                 execOptions: {
                     stderr: false,
@@ -475,50 +443,31 @@ module.exports = function(grunt) {
                     'git init',
                     'git config core.sparseCheckout true',
                     'echo ' + obj.data[d].visualization + '/*>> .git/info/sparse-checkout',
-                    'git remote add -f origin git@github.iu.edu:adhsimps/CNS-Framework-Plugins.git',
+                    'git remote add -f origin ' + '<%= projectURL %>',
                     'git fetch origin ' + obj.data[d].commit || 'master',
                     'git reset --hard FETCH_HEAD'
                 ].join('&&'),
                 options: {
                     execOptions: {
                         stderr: false,
-                        cwd: 'workspaces/visualizations/' + grunt.option('project')
+                        cwd: ('workspaces/visualizations/' + '<%= projectName %>')
                     }
                 }
             }
             grunt.task.run(['shell:' + obj.data[d].visualization])
         });
     });
-    grunt.registerTask('fetch-proj-files', ['clean:project', 'build-project-files']);
-    grunt.registerTask('fetch-proj-visuals', ['clean:visualization', 'build-project-visualizations']);
+    grunt.registerTask('fetch-proj-files', ['prompt:projectname', 'clean:project', 'build-project-files']);
+    grunt.registerTask('fetch-proj-visuals', ['prompt:projectname', 'prompt:projectrepos', 'clean:visualization', 'build-project-visualizations']);
     grunt.registerTask('build-framework', 'Clean the directory and copy the framework code to the deployment directory.', ['clean:deploy', 'copy:framework']);
     //TODO: Why does this no longer work?!
     grunt.registerTask('fetch-project', 'Fetch the project code from the remote repository, read the visIncludes.json file and fetch the corresponding visualizations. ' ['fetch-proj-files', 'fetch-proj-visuals']);
     grunt.registerTask('register-deploy-scripts', ['folder_list']);
-    // grunt clean-workspace
     grunt.registerTask('clean-workspace', 'Cleans the workspace', ['clean:projects', 'clean:visualizations', 'clean:deploys', 'mkdir:workspace']);
-    // grunt create-project --project=Project1 --projectrepo=C:\Users\simps_000\Desktop\CNS-Framework-Base\workspaces\projects\Project1
-    grunt.registerTask('create-project', ['clean:project', 'shell:createproject', 'copy:framework2']);
-    // grunt create-vis-config --project=Project1 --vis=SampleVis --alias=sampleVis01 
-    grunt.registerTask('create-vis-config', ['copy:vistemplate']);
-    // grunt build-project-full --project=Project1
-    grunt.registerTask('build-project-full', ['build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:flatten', 'register-deploy-scripts']);
-    // grunt build-project --project=Project1
-    grunt.registerTask('build-project', ['copy:project', 'copy:flatten', 'register-deploy-scripts']);
-    // grunt webserver
+    grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projectrepo', 'clean:project', 'shell:createproject', 'copy:framework2']);
+    // TODO: The template strings do not replace the file contents. 
+    grunt.registerTask('create-vis-config', ['prompt:projectname', 'prompt:visualizationname', 'prompt:visualizationalias', 'copy:vistemplate']);
+    grunt.registerTask('build-project-full', ['prompt:projectname', 'build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:flatten', 'register-deploy-scripts']);
+    grunt.registerTask('build-project', ['prompt:projectname', 'copy:framework', 'copy:project', 'copy:flatten', 'register-deploy-scripts']);
     grunt.registerTask('webserver', ['web_server', 'open:deploy']);
 };
-/*
-
-
-grunt build-framework --project=i2b2
-grunt fetch-proj-files --project=i2b2
-grunt fetch-proj-visuals --project=i2b2
-grunt copy:project --project=i2b2
-grunt copy:flatten --project=i2b2
-grunt register-deploy-scripts --project=i2b2
-
-*/
-
-// 
-// + grunt.option('projectrepo')// git@github.iu.edu:adhsimps/CNS-Framework-Project-IAI-Phase2.git

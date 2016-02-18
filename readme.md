@@ -1,10 +1,13 @@
 # CNS-Frontend-Visualization-Framework
+This framework contains a set of workflows, configurations, and tools to simplify web visualization creation and customization for CNS projects. This was made primarily for [D3js] visualizations, but can be used to create non-[D3js] visualizations with minimal modification. This framework is used in conjunction with the plugin repository (TODO: Link here). 
 
-Blah blah, summary about framework.
+## Goal
+Web visualization projects use quite a bit of similar code, and it can get pretty messy. Often these visualizations do not need to be completely rewritten for each application, but without a framework, it is easy to lock down the code for the particular application. This framework with the plugins provide generalized underlying visualizations that have methods to add layers of customization and standard methods to create.
 
-> "Look at this quote I found" - Adam Simpson
+Additionally, these visualizations need to be accessed and improved by people who may not know how to code, and quickly. The configuration objects and methods are made to extract most of the configurable options from the underlying code where they can be easily and safely modified. 
 
-Blah blah, continuation of summary about framework.
+We plan to grow our plugin library to cover many standard use cases that can be applied to non-standard needs. This allows us to cut down preliminary development time and spend more time customizing and improving the solution.
+
 ### Version
 0.0.0
 ### Technologies
@@ -15,6 +18,7 @@ Many web libraries are used to make this project function:
 * [node.js]
 * [jQuery]
 * [Head.js]
+* [D3js]
 ### Installation
 
 First, check out this project. Duh.
@@ -22,53 +26,58 @@ First, check out this project. Duh.
 You need npm, grunt, and git installed globally:
 * Git can be installed from: https://git-scm.com/download/win
 * NPM can be installed from: https://docs.npmjs.com/getting-started/installing-node
-
-Grunt
-```sh
-> npm install grunt
-```
+* Grunt can be installed with NPM: 
+*  ```sh
+   > npm install grunt
+   ```
 
 After grunt, npm, and git have been installed and added to your system's path:
 
 * Open a command prompt/terminal 
 * Navigate to the project directory (which include Gruntfile.js)
 * in your prompt, enter:
-```sh
-> grunt sometask --arg1=Opt1
-```
-* Grunt will notify you of any missing dpendencies or errors parsing the scripts. 
+*  ```sh
+   > grunt sometask --arg1=Opt1
+   ```
+* Grunt will notify you of any missing dependencies or errors parsing the scripts. 
+    *   To install dependencies from the Grunt package.json file, run the following command:
+    *  ```sh
+        > npm install --save
+        ```   
+    * To update the Grunt package.json file, run the following command:
+    * ```sh
+        > npm update --save
+        ```        
 
 The following code is used to access a simple UI for running pre-bundled grunt tasks. Enter this in your prompt, and follow the instructions given.
 ```sh
 > grunt prompt
 ```
 
-To update the Grunt package.json file, run the following command:
-```sh
-npm update --save
-```
+
 
 
 
 
 ### Development
 
-Want to contribute? Too bad, I don't trust you people.
+For now, this framework may be freely modified. Please fork this repository and submit a pull request with any structural changes. Also please respect the structure of this framework. Do not include data, project-specific configurations, or plugins to this repository. 
 
 ### TODOs
 
- - Prolly a lot
+ - Add test cases for contribution
+ - Improve Grunt build
+ - Solidify framework structure
 
 License
 ----
-I don't drive
 
 
-**Free Software, Hell Yeah!**
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
 
+   [D3js]: <https://d3js.org/>
    [dill]: <https://github.com/joemccann/dillinger>
    [git-repo-url]: <https://github.com/joemccann/dillinger.git>
    [john gruber]: <http://daringfireball.net>

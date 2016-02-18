@@ -94,11 +94,15 @@ var verbose = false;
     }, {
         "AngularTable.js": "visuals/AngularTable.js"
     }, {
-        "angularTable01-configs.js": "visuals/angularTable01-configs.js"
+        "angularTables-configs.js": "visuals/angularTables-configs.js"
     }, {
         "ProportionalSymbol.js": "visuals/ProportionalSymbol.js"
     }, {
+        "proportionalSymbol01-configs.js": "visuals/proportionalSymbol01-configs.js"
+    }, {
         "BarGraphDistort.js": "visuals/BarGraphDistort.js"
+    }, {
+        "barGraphDistort01-configs.js": "visuals/barGraphDistort01-configs.js"
     }, {
         "tableController.js": "visuals/tableController.js"
     }, {
@@ -108,8 +112,14 @@ var verbose = false;
     }, {
         "leaflet.css": "css/leaflet.css"
     }, {
-        "style.css": "css/style.css"
+        "style-main.css": "css/style-main.css"
     }, {
+        "style.css": "css/style.css"
+    },
+    // {
+    //     "less.js": "lib/less.js"
+    // }, 
+    {
         "angular-route.js": "lib/angular-route.js"
     });
 }).call(this);
