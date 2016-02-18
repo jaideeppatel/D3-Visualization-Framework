@@ -129,12 +129,12 @@ var VisualizationClass = function() {
 			 * @description  Creates simple D3 canvas with base configuration.
 			 */
 			out.easySVG = function(selector) {
-				return d3.select(selector)
-					.append("svg")
-					.attr("transform", "translate(" + out.margins.left + "," + out.margins.top + ")")
-					.attr("width", out.dims.width)
-					.attr("height", out.dims.height);
-			}
+					return d3.select(selector)
+						.append("svg")
+						.attr("transform", "translate(" + out.margins.left + "," + out.margins.top + ")")
+						.attr("width", out.dims.width)
+						.attr("height", out.dims.height);
+				}
 				/**
 				 * @memberOf CreateBaseConfig
 				 * @type Function
@@ -338,10 +338,11 @@ var VisualizationClass = function() {
 		this.ClearVis = function() {
 			try {
 				//TODO: Need to remove Leaflet somehow. 
-				this.AngularArgs.element[0].innerHTML = "";
-			} catch (exception) {
-				throw exception;
-			}
+				this.SVG.selectAll("*").remove();
+				$(this.AngularArgs.element[0]).empty()
+					// this.AngularArgs.element[0].innerHTML = "";
+
+			} catch (exception) {}
 			return this;
 		},
 
@@ -393,27 +394,28 @@ var VisualizationClass = function() {
 	 * @description Runs the {@link dataprep} for an instanced visualization if it exists. Otherwise, copies the Angular provided data object to {@link filteredData}
 	 */
 	this.prepareData = function() {
-			if (dataprep[this.AngularArgs.opts.ngIdentifier]) {
-				dataprep[this.AngularArgs.opts.ngIdentifier](visualizations[this.AngularArgs.opts.ngIdentifier]);
-			} else {
-				this.filteredData = this.AngularArgs.data;
-			}
+		this.filteredData = JSON.parse(JSON.stringify(this.AngularArgs.data));
+		if (dataprep[this.AngularArgs.opts.ngIdentifier]) {
+			dataprep[this.AngularArgs.opts.ngIdentifier](visualizations[this.AngularArgs.opts.ngIdentifier]);
 		}
-		/**
-		 * @memberOf CreateBaseConfig
-		 * @type Function
-		 * @property {Object} args 
-		 * @returns Instance of {@link VisualizationClass}
-		 * @description Runs the {@link visualizationFunctions} for an instanced visualization. Calls are queued and ran ever .01 seconds. Angular controllers run through at least two digest cycles per change, we only care about the last. Runs the {@link events} and fires the component visualizations if they exist.
-		 */
+	};
+	/**
+	 * @memberOf CreateBaseConfig
+	 * @type Function
+	 * @property {Object} args 
+	 * @returns Instance of {@link VisualizationClass}
+	 * @description Runs the {@link visualizationFunctions} for an instanced visualization. Calls are queued and ran ever .01 seconds. Angular controllers run through at least two digest cycles per change, we only care about the last. Runs the {@link events} and fires the component visualizations if they exist.
+	 */
 	this.RunVis = function(args) {
 			var args = args || {};
 			clearTimeout(this.RunVisQueue);
 			var that = this;
 			this.RunVisQueue = setTimeout(function() {
-				that.prepareData();
 				that.ClearVis();
-				if (that.isFirstRun) that.Vis(that.AngularArgs.element, that.AngularArgs.data, that.AngularArgs.opts);
+				if (that.isFirstRun) {
+					that.prepareData();
+					that.Vis(that.AngularArgs.element, that.AngularArgs.data, that.AngularArgs.opts);
+				}
 				try {
 					if (!that.AngularArgs.opts.ngLazy || args.lazyRun) that.VisFunc();
 				} catch (exception) {
@@ -428,7 +430,7 @@ var VisualizationClass = function() {
 					that.RunEvents();
 				});
 				that.isFirstRun = false;
-			}, 10);
+			}, 200);
 			return that;
 		},
 
