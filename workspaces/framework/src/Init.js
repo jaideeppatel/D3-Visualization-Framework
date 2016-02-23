@@ -92,21 +92,21 @@ var verbose = false;
     }, {
         "Visualization.js": "src/Visualization.js"
     }, {
-        "AngularTable.js": "visuals/AngularTable.js"
+        "AngularTable.js": "visuals/AngularTable/AngularTable/AngularTable.js"
     }, {
         "angularTables-configs.js": "visuals/angularTables-configs.js"
     }, {
-        "ProportionalSymbol.js": "visuals/ProportionalSymbol.js"
+        "ProportionalSymbol.js": "visuals/ProportionalSymbol/ProportionalSymbol/ProportionalSymbol.js"
     }, {
         "proportionalSymbol01-configs.js": "visuals/proportionalSymbol01-configs.js"
     }, {
-        "BarGraphDistort.js": "visuals/BarGraphDistort.js"
+        "BarGraphDistort.js": "visuals/BarGraphDistort/BarGraphDistort/BarGraphDistort.js"
     }, {
         "barGraphDistort01-configs.js": "visuals/barGraphDistort01-configs.js"
     }, {
-        "tableController.js": "visuals/tableController.js"
+        "tableController.js": "visuals/AngularTable/AngularTable/tableController.js"
     }, {
-        "underlyingStateData.js": "visuals/underlyingStateData.js"
+        "underlyingStateData.js": "visuals/ProportionalSymbol/ProportionalSymbol/underlyingStateData.js"
     }, {
         "tmp/includes.json": "src/tmp/includes.json"
     }, {
