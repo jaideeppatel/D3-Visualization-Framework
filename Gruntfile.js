@@ -149,14 +149,13 @@ module.exports = function(grunt) {
                 src: ['**/*'],
                 dest: ('deploy/' + '<%= projectName %>'),
             },
-            //Copies src files to dest (flattens directories)
-            //TODO: Change name         
-            flatten: {
+            // Copies src files to dest
+            visualizations: {
                 expand: true,
-                cwd: 'workspaces/visualizations',
+                cwd: ('workspaces/visualizations/' + '<%= projectName %>'),
                 src: ['**/*.js', '**/*.json', '!**/visincludes.json', '!**/*-config.js'],
                 dest: ('deploy/' + '<%= projectName %>' + '/visuals'),
-                flatten: true
+                flatten: false
             },
             //Copies templates and replaces placeholders with paramater values 
             vistemplate: {
@@ -189,6 +188,14 @@ module.exports = function(grunt) {
                 src: ['**/*.*', '!.git/'],
                 dest: ('deploy/' + '<%= projectName %>')
             },
+            watchcopyframework: {
+                expand: true,
+                dot: true,
+                cwd: ('workspaces/framework/'),
+                src: ['**/*.*', '!.git/'],
+                //TODO: This doesn't point to the correct location .Fix and test.
+                dest: ('deploy/' + '<%= projectName %>'),
+            },
             watchcopyvisualizations: {
                 expand: true,
                 dot: true,
@@ -196,7 +203,6 @@ module.exports = function(grunt) {
                 src: ['**/*.*', '!.git/'],
                 //TODO: This doesn't point to the correct location .Fix and test.
                 dest: ('deploy/' + '<%= projectName %>' + '/visuals'),
-                flatten: true
             }
         },
         //Watches specified folders and run tasks when a file is changed.
@@ -204,7 +210,7 @@ module.exports = function(grunt) {
             project: {
                 files: ['**/*.*'],
                 //Newer is a task that compares timestamps of two compared files and runs tasks if the compared file is
-                tasks: ['newer:copy:watchcopyproject'],
+                tasks: ['newer:copy:watchcopyframework', 'newer:copy:watchcopyproject'],
                 options: {
                     //nospawn is depricated but kept for compatibility.  use spawn false instead
                     spawn: false,
@@ -222,7 +228,7 @@ module.exports = function(grunt) {
                 },
             },
             main: {
-                files: ['**/*.*'],
+                files: ['workspaces/framework/*.*', ''],
                 options: {
                     cwd: ('deploy/' + '<%= projectName %>'),
                     livereload: true
@@ -467,7 +473,7 @@ module.exports = function(grunt) {
     grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projectrepo', 'clean:project', 'shell:createproject', 'copy:framework2']);
     // TODO: The template strings do not replace the file contents. 
     grunt.registerTask('create-vis-config', ['prompt:projectname', 'prompt:visualizationname', 'prompt:visualizationalias', 'copy:vistemplate']);
-    grunt.registerTask('build-project-full', ['prompt:projectname', 'build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:flatten', 'register-deploy-scripts']);
-    grunt.registerTask('build-project', ['prompt:projectname', 'copy:framework', 'copy:project', 'copy:flatten', 'register-deploy-scripts']);
+    grunt.registerTask('build-project-full', ['prompt:projectname', 'build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
+    grunt.registerTask('build-project', ['prompt:projectname', 'copy:framework', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
     grunt.registerTask('webserver', ['web_server', 'open:deploy']);
 };
