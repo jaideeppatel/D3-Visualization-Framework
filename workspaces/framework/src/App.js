@@ -1,4 +1,3 @@
-
 /**
  * @namespace  app
  * @type {Object}
@@ -166,7 +165,7 @@ app.directive('ngCnsVisRunner', ['$rootScope', '$timeout', 'Data', function($roo
      * @namespace  ngCnsVisRunner
      * @memberOf  app
      * @description Angular directive. Surrounds all {@link app.ngCnsVisual} to allow for synchronous operations. Gets data after all visualizations have been bound. 
-     */    
+     */
     return {
         restrict: "A",
         controller: ['$scope', '$http', function($scope, $http) {
@@ -200,21 +199,21 @@ app.controller("basicCtrl", ["$scope", function($scope) {
     }
     $scope.itemsByPage = 10;
     $scope.removeItem = function removeItem(row) {
-        var index = $scope.rowCollection.indexOf(row);
-        if (index !== -1) {
-            $scope.rowCollection.splice(index, 1);
+            var index = $scope.rowCollection.indexOf(row);
+            if (index !== -1) {
+                $scope.rowCollection.splice(index, 1);
+            }
         }
-    }
-    // $scope.$watch(function() {
-    //     console.log("Digesting!")
-    // });
+        // $scope.$watch(function() {
+        //     console.log("Digesting!")
+        // });
 
     $scope.filter = function(val) {
         val = val || ''
         $scope.displayedCollection = [];
         $scope.rowCollection.forEach(function(d, i) {
             var include = false;
-            
+
             Object.keys(d).forEach(function(d1, i1) {
                 if (d[d1].toString().indexOf(val.toString()) >= 0) {
                     include = true;
@@ -242,7 +241,7 @@ app.controller("basicCtrl", ["$scope", function($scope) {
 
     // get data
     // }
-}]);
+}])
 
 angular.element(document).ready(function() {
     angular.bootstrap(document, ['app']);

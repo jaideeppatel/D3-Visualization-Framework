@@ -235,9 +235,6 @@ module.exports = function(grunt) {
                 },
             },
         },
-
-
-
         prompt: {
             tasks: {
                 options: {
