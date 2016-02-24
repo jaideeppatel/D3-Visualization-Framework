@@ -128,12 +128,14 @@ var VisualizationClass = function() {
 			 * @return Object D3 canvas.
 			 * @description  Creates simple D3 canvas with base configuration.
 			 */
-			out.easySVG = function(selector) {
+			out.easySVG = function(selector, args) {
+					args = args || {};
 					return d3.select(selector)
 						.append("svg")
 						.attr("transform", "translate(" + out.margins.left + "," + out.margins.top + ")")
-						.attr("width", out.dims.width)
-						.attr("height", out.dims.height);
+						.attr("width", args.width || out.dims.width)
+						.attr("height", args.height || out.dims.height)
+						.attr("background", "white");
 				}
 				/**
 				 * @memberOf CreateBaseConfig
@@ -176,10 +178,22 @@ var VisualizationClass = function() {
 						.scale(opts.y.scale1)
 						.tickSize(network.SVG.graphOpts.width)
 						.orient(opts.y.orient || "left");
-					network.SVG.graphG = network.SVG.append("g")
-						.attr("transform", function(d, i) {
-							return "translate(" + network.SVG.graphOpts.wOffset + "," + network.SVG.graphOpts.hOffset + ")"
-						});
+
+					if (!network.SVG.graphG) {
+						network.SVG.graphG = network.SVG.append("g")
+							.attr("class", "graphG")
+							.attr("transform", function(d, i) {
+								return "translate(" + network.SVG.graphOpts.wOffset + "," + network.SVG.graphOpts.hOffset + ")"
+							});
+
+					}
+
+					// if (network.Scales.x.domain()[0] == network.Scales.x.domain()[1]) {
+					// 	if (network.Scales.x.domain()[1] >= 0) {
+					// 		network.Scales.x.domain([0, network.Scales.x.domain()[1]])
+					// 	}
+					// }
+
 					var xAxisTranslate = network.SVG.graphOpts.height;
 					var yAxisTranslate = network.SVG.graphOpts.width;
 					var xLabelTranslate = network.SVG.graphOpts.height + network.SVG.graphOpts.hOffset;
@@ -195,6 +209,21 @@ var VisualizationClass = function() {
 						yLabelTranslate = network.SVG.graphOpts.width + network.SVG.graphOpts.wOffset;
 					}
 					if (opts.t.orient == "bottom") tLabelTranslate = network.SVG.graphOpts.height + 40;
+
+					if (network.SVG.xAxisG) network.SVG.xAxisG.remove()
+					if (network.SVG.yAxisG) network.SVG.yAxisG.remove()
+					if (network.SVG.xAxisLabel) network.SVG.xAxisLabel.remove()
+					if (network.SVG.yAxisLabel) network.SVG.yAxisLabel.remove()
+					if (network.SVG.title) network.SVG.title.remove()
+
+					if (!network.SVG.graphArea) {
+						network.SVG.graphArea = network.SVG.graphG.append("g")
+							.attr("class", "graphArea")
+							.attr("transform", "translate(" + (xAxisTranslate * 2 + 1) + "," + (yAxisTranslate * 2 + 1) + ")")
+							// network.SVG.graphArea.append("rect")
+							// 	.attr("width", 20)
+							// 	.attr("height", 20)
+					}
 
 					network.SVG.xAxisG = network.SVG.graphG.append("g")
 						.attr("class", "x axis")
