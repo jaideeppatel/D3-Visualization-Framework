@@ -4,7 +4,7 @@ visualizationFunctions.LineGraph = function(element, data, opts) {
 	network.config = network.CreateBaseConfig();
 	network.meta = network.config.meta;
 
-	var data = network.GetData();
+	var data = network.filteredData;
 	network.SVG = network.config.easySVG(element[0])
 		.attr("background", "white")
 		.attr("class", "canvas " + opts.ngIdentifier)
@@ -47,7 +47,7 @@ visualizationFunctions.LineGraph = function(element, data, opts) {
 		    .key(function(d) { return d.y})				
 		    .rollup(function(leaves) { 
 				var obj = {children:leaves};
-				network.GetData().records.schema.forEach(function(d) {
+				network.filteredData.records.schema.forEach(function(d) {
 					if (d.type == "numeric") {
 						obj[d.name] = d3.sum(leaves, function(d1) {
 							return d1[d.name];
@@ -56,7 +56,7 @@ visualizationFunctions.LineGraph = function(element, data, opts) {
 				})
 				return obj;
 			})
-			.entries(network.GetData().records.data);
+			.entries(network.filteredData.records.data);
 
 
 
