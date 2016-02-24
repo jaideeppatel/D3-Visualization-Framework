@@ -318,6 +318,10 @@ module.exports = function(grunt) {
                         config: 'visualizationName',
                         type: 'input',
                         message: 'Please enter the visualization name (Same as top level folder in repository):',
+                        when: function(answers) {
+                            if (answers.visualizationName) return false;
+                            return true;
+                        }
                     }],
                     then: function() {
                     }
@@ -329,6 +333,10 @@ module.exports = function(grunt) {
                         config: 'commitID',
                         type: 'input',
                         message: 'Please enter the commit id:',
+                        when: function(answers) {
+                            if (answers.commitID) return false;
+                            return true;
+                        }                        
                     }],
                     then: function() {
                     }
@@ -340,6 +348,10 @@ module.exports = function(grunt) {
                         config: 'visualizationAlias',
                         type: 'input',
                         message: 'Please enter the visualization alias (Should be unique to prevent issues):',
+                        when: function(answers) {
+                            if (answers.visualizationAlias) return false;
+                            return true;
+                        }
                     }],
                     then: function() {
                     }
@@ -351,6 +363,11 @@ module.exports = function(grunt) {
                         config: 'projectName',
                         type: 'input',
                         message: 'Please enter the project name (alias):',
+                        when: function(answers) {
+                            console.log(answers)
+                            if (answers.projectName) return false;
+                            return true;
+                        }
                     }],
                     then: function() {
                     }
@@ -362,6 +379,10 @@ module.exports = function(grunt) {
                         config: 'baseURL',
                         type: 'input',
                         message: 'Please enter the framework base repo URL:',
+                        when: function(answers) {
+                            if (answers.baseURL) return false;
+                            return true;
+                        }
                     }],
                     then: function() {
                     }
@@ -373,6 +394,10 @@ module.exports = function(grunt) {
                         config: 'pluginsURL',
                         type: 'input',
                         message: 'Please enter the plugins repo URL:',
+                        when: function(answers) {
+                            if (answers.pluginsURL) return false;
+                            return true;
+                        }
                     }],
                     then: function() {
                     }
@@ -384,6 +409,10 @@ module.exports = function(grunt) {
                         config: 'projectURL',
                         type: 'input',
                         message: 'Please enter the project repo URL:',
+                        when: function(answers) {
+                            if (answers.projectURL) return false;
+                            return true;
+                        }
                     }],
                     then: function() {
                     }
@@ -394,6 +423,16 @@ module.exports = function(grunt) {
             workspace: {
                 options: {
                     create: ['deploy', 'workspaces/projects', 'workspaces/visualizations']
+                },
+            },
+            visworkspace: {
+                options: {
+                    create: ['workspaces/visualizations']
+                },
+            },
+            projworkspace: {
+                options: {
+                    create: ['workspaces/projects']
                 },
             },
         },
@@ -425,14 +464,16 @@ module.exports = function(grunt) {
     grunt.registerTask('watch-proj-and-vis', ['watch-proj', 'watch-vis']);
     grunt.registerTask('build-project-files', ['shell:initproject']);
     grunt.registerTask('build-project-visualizations', function() {
-        var obj = grunt.file.readJSON(('workspaces/projects/' + '<%= projectName %>' + '/visuals/visincludes.json'));
+        var projName = grunt.template.process('<%= projectName %>');
+        var projURL = grunt.template.process('<%= projectURL %>');
+        var plugURL = grunt.template.process('<%= pluginsURL %>');
+        var obj = grunt.file.readJSON(('workspaces/projects/' + projName + '/visuals/visincludes.json'));
         grunt.config.data.shell.makeprojdir = {
-            command: ('mkdir ' + '<%= projectName %>'),
+            command: ('mkdir ' + projName),
             options: {
                 execOptions: {
                     stderr: false,
-                    cwd: 'workspaces/visualizations',
-                    spawn: true
+                    cwd: 'workspaces/visualizations'
                 }
             }
         }
@@ -446,22 +487,22 @@ module.exports = function(grunt) {
                     'git init',
                     'git config core.sparseCheckout true',
                     'echo ' + obj.data[d].visualization + '/*>> .git/info/sparse-checkout',
-                    'git remote add -f origin ' + '<%= projectURL %>',
+                    'git remote add -f origin ' + plugURL,
                     'git fetch origin ' + obj.data[d].commit || 'master',
                     'git reset --hard FETCH_HEAD'
                 ].join('&&'),
                 options: {
                     execOptions: {
                         stderr: false,
-                        cwd: ('workspaces/visualizations/' + '<%= projectName %>')
+                        cwd: ('workspaces/visualizations/' + projName)
                     }
                 }
             }
             grunt.task.run(['shell:' + obj.data[d].visualization])
         });
     });
-    grunt.registerTask('fetch-proj-files', ['prompt:projectname', 'clean:project', 'build-project-files']);
-    grunt.registerTask('fetch-proj-visuals', ['prompt:projectname', 'prompt:projectrepos', 'clean:visualization', 'build-project-visualizations']);
+    grunt.registerTask('fetch-proj-files', ['clean:project', 'mkdir:projworkspace', 'build-project-files']);
+    grunt.registerTask('fetch-proj-visuals', ['clean:visualization', 'mkdir:visworkspace', 'build-project-visualizations']);
     grunt.registerTask('build-framework', 'Clean the directory and copy the framework code to the deployment directory.', ['clean:deploy', 'copy:framework']);
     //TODO: Why does this no longer work?!
     grunt.registerTask('fetch-project', 'Fetch the project code from the remote repository, read the visIncludes.json file and fetch the corresponding visualizations. ' ['fetch-proj-files', 'fetch-proj-visuals']);
@@ -470,7 +511,7 @@ module.exports = function(grunt) {
     grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projectrepo', 'clean:project', 'shell:createproject', 'copy:framework2']);
     // TODO: The template strings do not replace the file contents. 
     grunt.registerTask('create-vis-config', ['prompt:projectname', 'prompt:visualizationname', 'prompt:visualizationalias', 'copy:vistemplate']);
-    grunt.registerTask('build-project-full', ['prompt:projectname', 'build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
+    grunt.registerTask('build-project-full', ['prompt:projectname', 'prompt:projectrepo', 'prompt:pluginsrepo', 'build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
     grunt.registerTask('build-project', ['prompt:projectname', 'copy:framework', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
     grunt.registerTask('webserver', ['web_server', 'open:deploy']);
 };
