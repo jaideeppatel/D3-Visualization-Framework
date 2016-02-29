@@ -423,7 +423,11 @@ var VisualizationClass = function() {
 	 * @description Runs the {@link dataprep} for an instanced visualization if it exists. Otherwise, copies the Angular provided data object to {@link filteredData}
 	 */
 	this.prepareData = function() {
-		this.filteredData = JSON.parse(JSON.stringify(this.AngularArgs.data));
+		if (this.AngularArgs.opts.ngComponentFor) {
+			this.filteredData = JSON.parse(JSON.stringify(visualizations[this.AngularArgs.opts.ngComponentFor].filteredData));
+		} else {
+			this.filteredData = JSON.parse(JSON.stringify(this.AngularArgs.data));
+		}
 		if (dataprep[this.AngularArgs.opts.ngIdentifier]) {
 			dataprep[this.AngularArgs.opts.ngIdentifier](visualizations[this.AngularArgs.opts.ngIdentifier]);
 		}

@@ -61,7 +61,8 @@ var verbose = false;
 // AJAX_JSON_Req('src/tmp/includes.json');
 (function() {
     'use strict';
-    head.js({
+    head.js(
+    {
         "angular-ui-router.js": "lib/angular-ui-router.js"
     }, {
         "bootstrap.min.js": "lib/bootstrap.min.js"
