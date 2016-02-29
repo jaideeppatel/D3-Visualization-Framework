@@ -119,7 +119,7 @@ module.exports = function(grunt) {
             projects: ['workspaces/projects'],
             project: [('workspaces/projects/' + '<%= projectName %>')],
             visualizations: ['workspaces/visualizations/'],
-            visualization: ['workspaces/visualizations/' + '<%= visualizationName %>']
+            visualization: ['workspaces/visualizations/' + '<%= projectName %>']
         },
         //Copies src directory to dest
         copy: {
@@ -141,7 +141,7 @@ module.exports = function(grunt) {
                 expand: true,
                 cwd: 'workspaces/framework',
                 src: ['**/*', '!lib/*', '!src/*', 'src/tmp/', 'src/DatasourceMap.js'],
-                dest: ('workspaces/projects/' + '<%= projectName %>' + '/'),
+                dest: ('workspaces/projects/' + '<%= projectName %>' + '/' + '<% visualizationName %>'),
             },
             project: {
                 expand: true,
@@ -305,13 +305,26 @@ module.exports = function(grunt) {
                     then: function(answers) {
                         // '<%= projectName %>' = answers.configval
 
-                        if (answers.dangerconfirm != false) {
+                        if (grunt.config.data.dangerconfirm != false) {
                             grunt.task.run(answers.tasklist);
                         }
                     }
                 }
             },
-
+            configdir: {
+                options: {
+                    questions: [{
+                        config: 'configdir',
+                        type: 'input',
+                        message: 'Please enter the config file location:',
+                        when: function(answers) {
+                            if (grunt.config.data.configdir) return false;
+                            return true;
+                        }
+                    }],
+                    then: function() {}
+                }
+            },
             visualizationname: {
                 options: {
                     questions: [{
@@ -319,12 +332,11 @@ module.exports = function(grunt) {
                         type: 'input',
                         message: 'Please enter the visualization name (Same as top level folder in repository):',
                         when: function(answers) {
-                            if (answers.visualizationName) return false;
+                            if (grunt.config.data.visualizationName) return false;
                             return true;
                         }
                     }],
-                    then: function() {
-                    }
+                    then: function() {}
                 }
             },
             commitid: {
@@ -334,12 +346,11 @@ module.exports = function(grunt) {
                         type: 'input',
                         message: 'Please enter the commit id:',
                         when: function(answers) {
-                            if (answers.commitID) return false;
+                            if (grunt.config.data.commitID) return false;
                             return true;
-                        }                        
+                        }
                     }],
-                    then: function() {
-                    }
+                    then: function() {}
                 }
             },
             visualizationalias: {
@@ -349,12 +360,11 @@ module.exports = function(grunt) {
                         type: 'input',
                         message: 'Please enter the visualization alias (Should be unique to prevent issues):',
                         when: function(answers) {
-                            if (answers.visualizationAlias) return false;
+                            if (grunt.config.data.visualizationAlias) return false;
                             return true;
                         }
                     }],
-                    then: function() {
-                    }
+                    then: function() {}
                 }
             },
             projectname: {
@@ -364,13 +374,11 @@ module.exports = function(grunt) {
                         type: 'input',
                         message: 'Please enter the project name (alias):',
                         when: function(answers) {
-                            console.log(answers)
-                            if (answers.projectName) return false;
+                            if (grunt.config.data.projectName) return false;
                             return true;
                         }
                     }],
-                    then: function() {
-                    }
+                    then: function() {}
                 }
             },
             baserepo: {
@@ -380,12 +388,11 @@ module.exports = function(grunt) {
                         type: 'input',
                         message: 'Please enter the framework base repo URL:',
                         when: function(answers) {
-                            if (answers.baseURL) return false;
+                            if (grunt.config.data.baseURL) return false;
                             return true;
                         }
                     }],
-                    then: function() {
-                    }
+                    then: function() {}
                 }
             },
             pluginsrepo: {
@@ -395,12 +402,11 @@ module.exports = function(grunt) {
                         type: 'input',
                         message: 'Please enter the plugins repo URL:',
                         when: function(answers) {
-                            if (answers.pluginsURL) return false;
+                            if (grunt.config.data.pluginsURL) return false;
                             return true;
                         }
                     }],
-                    then: function() {
-                    }
+                    then: function() {}
                 }
             },
             projectrepo: {
@@ -410,12 +416,11 @@ module.exports = function(grunt) {
                         type: 'input',
                         message: 'Please enter the project repo URL:',
                         when: function(answers) {
-                            if (answers.projectURL) return false;
+                            if (grunt.config.data.projectURL) return false;
                             return true;
                         }
                     }],
-                    then: function() {
-                    }
+                    then: function() {}
                 }
             }
         },
@@ -450,7 +455,9 @@ module.exports = function(grunt) {
     }
 
     grunt.loadTasks('tasks');
-
+    // Object.keys(config.pkg.devDependencies).forEach(function(d) {
+    //     grunt.loadNpmTasks(d);
+    // })
     //Load all tasks in array
     ['grunt-jsdoc', 'grunt-peon-gui', 'grunt-shell', 'grunt-contrib-copy', 'grunt-contrib-clean', 'grunt-contrib-jshint', 'grunt-contrib-watch', 'grunt-jslint', 'grunt-jsbeautifier', 'grunt-folder-list', 'grunt-web-server', 'grunt-contrib-watch', 'grunt-newer', 'grunt-prompt', 'grunt-mkdir', 'grunt-available-tasks']
     .forEach(function(d) {
@@ -463,6 +470,15 @@ module.exports = function(grunt) {
     grunt.registerTask('watch-vis', ['watch:visualizations']);
     grunt.registerTask('watch-proj-and-vis', ['watch-proj', 'watch-vis']);
     grunt.registerTask('build-project-files', ['shell:initproject']);
+    grunt.registerTask('set-config-file', function() {
+        if (grunt.option('config-dir')) {
+            var obj = grunt.file.readJSON(grunt.option('config-dir'));
+            Object.keys(obj).forEach(function(d, i) {
+                grunt.config.data[d] = obj[d];
+            })
+        }
+    });
+
     grunt.registerTask('build-project-visualizations', function() {
         var projName = grunt.template.process('<%= projectName %>');
         var projURL = grunt.template.process('<%= projectURL %>');
@@ -501,6 +517,7 @@ module.exports = function(grunt) {
             grunt.task.run(['shell:' + obj.data[d].visualization])
         });
     });
+    grunt.task.run(['set-config-file']);
     grunt.registerTask('fetch-proj-files', ['clean:project', 'mkdir:projworkspace', 'build-project-files']);
     grunt.registerTask('fetch-proj-visuals', ['clean:visualization', 'mkdir:visworkspace', 'build-project-visualizations']);
     grunt.registerTask('build-framework', 'Clean the directory and copy the framework code to the deployment directory.', ['clean:deploy', 'copy:framework']);
