@@ -16,15 +16,7 @@ module.exports = function(grunt) {
     }
     var path = require('path');
     var config = {
-
-        //TODO: Prompt option for forking everything to user's account
-        // projecturl: '',
-        // visualizationsrepo: '',
-        // frameworkrepo: '',
-        // project: '<%= projectName %>',
-        alias: '<%= visualizationAlias %>',
         pkg: grunt.file.readJSON('package.json'),
-        // vis: grunt.file.readJSON('visincludes.json'),
         web_server: {
             options: {
                 cors: true,
@@ -33,7 +25,6 @@ module.exports = function(grunt) {
                 logRequests: true
             },
             foo: 'bar' // For some reason an extra key with a non-object value is necessary 
-
         },
         //Shell scripts
         shell: {
@@ -49,9 +40,9 @@ module.exports = function(grunt) {
                 command: [
                     'git init',
                     'git remote add -f origin ' + '<%= projectURL %>',
-                    'git fetch origin ' + ('<%= commitID %>' || 'master'),
+                    ('git fetch origin ' + ('<%= commitID %>' || 'master')),
                     'git reset --hard FETCH_HEAD'
-                ].join('&&'),
+                ].join('&&')
             },
             //Creates a new project. Must be checked into the remote repository before performing a full build
             //Creates a directory with the name of the 'project' parameter
@@ -61,12 +52,12 @@ module.exports = function(grunt) {
             //Adds the 'project' parameter to the sparseCheckout (so we only check out the right project).
             //Adds the remote repository
             createproject: {
-                    //TODO: If projecturl options is not specified, ignore
+                //TODO: If projecturl options is not specified, ignore
                 command: [
                     'git init',
                     'git remote add -f origin <%= projectURL %>'
-                ].join('&&'),
-            }
+                ].join('&&')
+            },
             options: {
                 execOptions: {
                     stderr: false,
@@ -90,26 +81,26 @@ module.exports = function(grunt) {
                 expand: true,
                 cwd: 'deploy/',
                 src: ['**/*'],
-                dest: ('backup-deploy/'),
+                dest: ('backup-deploy/')
             },
             framework: {
                 expand: true,
                 cwd: 'workspaces/framework',
                 src: ['**/*'],
-                dest: ('deploy/' + '<%= projectName %>'),
+                dest: ('deploy/' + '<%= projectName %>')
             },
             //TODO: Change name
             strippedframework: {
                 expand: true,
                 cwd: 'workspaces/framework',
                 src: ['**/*', '!lib/*', '!src/*', 'src/tmp/', 'src/DatasourceMap.js'],
-                dest: ('workspaces/projects/' + '<%= projectName %>' + '/' + '<% visualizationName %>'),
+                dest: ('workspaces/projects/' + '<%= projectName %>' + '/' + '<% visualizationName %>')
             },
             project: {
                 expand: true,
                 cwd: ('workspaces/projects/' + '<%= projectName %>' + '/'),
                 src: ['**/*'],
-                dest: ('deploy/' + '<%= projectName %>'),
+                dest: ('deploy/' + '<%= projectName %>')
             },
             // Copies src files to dest
             visualizations: {
@@ -126,31 +117,31 @@ module.exports = function(grunt) {
                 src: ['templates/generatedVisContent/*'],
                 dest: ('workspaces/projects/' + '<%= projectName %>' + '/visuals'),
                 rename: function(dest, srcPath) {
-                    return dest + '/' + srcPath.replace(/\bVISALIAS\b/g, '<%= visualizationAlias %>');
+                    return dest + '/' + srcPath.replace(/\bVISALIAS\b/g, grunt.template.process('<%= projectName %>'));
                 },
                 options: {
                     process: function(content, srcpath) {
                         var cont = content;
-                        cont = cont.replace(/\bVISALIASALT\b/g, '<%= visualizationAlias %>'
+                        cont = cont.replace(/\bVISALIASALT\b/g, grunt.template.process('<%= visualizationAlias %>')
                             .replace(/(?:^|\.?)([A-Z])/g, function(x, y) {
                                 return "_" + y.toLowerCase();
                             }).replace(/^_/, ""));
-                        cont = cont.replace(/\bVISALIAS\b/g, '<%= visualizationAlias %>');
-                        cont = cont.replace(/\bVISNAME\b/g, '<%= visualizationName %>');
+                        cont = cont.replace(/\bVISALIAS\b/g, grunt.template.process('<%= visualizationAlias %>'));
+                        cont = cont.replace(/\bVISNAME\b/g, grunt.template.process('<%= visualizationName %>'));
                         return cont;
-                    },
+                    }
                 },
                 flatten: true
             },
             //Runs copy tasks 
-            watch-copyproject: {
+            watchcopyproject: {
                 expand: true,
                 dot: true,
                 cwd: ('workspaces/projects/' + '<%= projectName %>'),
                 src: ['**/*.*', '!.git/'],
                 dest: ('deploy/' + '<%= projectName %>')
             },
-            watch-copyframework: {
+            watchcopyframework: {
                 expand: true,
                 dot: true,
                 cwd: ('workspaces/framework/'),
@@ -158,7 +149,7 @@ module.exports = function(grunt) {
                 //TODO: This doesn't point to the correct location .Fix and test.
                 dest: ('deploy/' + '<%= projectName %>'),
             },
-            watch-copyvisualizations: {
+            watchcopyvisualizations: {
                 expand: true,
                 dot: true,
                 cwd: ('workspaces/visualizations/' + '<%= projectName %>'),
@@ -172,7 +163,7 @@ module.exports = function(grunt) {
         watch: {
             project: {
                 files: ['**/*.*'],
-                tasks: ['newer:copy:watch-copyframework', 'newer:copy:watch-copyproject'],
+                tasks: ['newer:copy:watchcopyframework', 'newer:copy:watchcopyproject'],
                 options: {
                     spawn: false,
                     cwd: ('workspaces/projects/' + '<%= projectName %>'),
@@ -181,7 +172,7 @@ module.exports = function(grunt) {
             },
             visualizations: {
                 files: ['**/*.*'],
-                tasks: ['newer:copy:watch-copyvisualizations'],
+                tasks: ['newer:copy:watchcopyvisualizations'],
                 options: {
                     spawn: false,
                     cwd: ('workspaces/visualizations/' + '<%= projectName %>'),
@@ -361,7 +352,8 @@ module.exports = function(grunt) {
             Object.keys(obj).forEach(function(d, i) {
                 grunt.config.data[d] = obj[d];
             })
-        }});
+        }
+    });
     grunt.registerTask('build-project-visualizations', function() {
         var projectName = grunt.template.process('<%= projectName %>');
         var pluginsURL = grunt.template.process('<%= pluginsURL %>');
@@ -388,7 +380,8 @@ module.exports = function(grunt) {
                 }
             }
             grunt.task.run(['shell:' + obj.data[d].visualization])
-        });});
+        });
+    });
     grunt.registerTask('create-visualization', function() {
         var projectName = grunt.template.process('<%= projectName %>');
         var pluginsURL = grunt.template.process('<%= pluginsURL %>');
@@ -410,16 +403,19 @@ module.exports = function(grunt) {
                 }
             }
         }
-        grunt.task.run(['shell:' + visualizationName])});
+        grunt.task.run(['shell:' + visualizationName])
+    });
     grunt.task.run(['set-config-file']);
     grunt.registerTask('create-project-visualization', ['prompt:projectname', 'prompt:pluginsurl', 'prompt:visualizationname', 'create-visualization'])
-    grunt.registerTask('fetch-proj-files', ['prompt:projectname', 'prompt:projecturl', 'clean:project', 'mkdir:projworkspace', 'build-project-files']);
-    grunt.registerTask('fetch-proj-visuals', ['clean:visualization', 'mkdir:visworkspace', 'build-project-visualizations']);
-    grunt.registerTask('build-framework', 'Clean the directory and copy the framework code to the deployment directory.', ['clean:deploy', 'copy:framework']);
+    grunt.registerTask('fetch-proj-files', ['prompt:projectname', 'prompt:projecturl', 'clean:project', 'mkdir:projectworkspace', 'build-project-files']);
+    grunt.registerTask('fetch-proj-visuals', ['prompt:projectname', 'prompt:pluginsurl', 'clean:visualization', 'mkdir:visworkspace', 'build-project-visualizations']);
+    grunt.registerTask('build-framework', 'Clean the directory and copy the framework code to the deployment directory.', ['prompt:projectname', 'clean:deploy', 'copy:framework']);
     grunt.registerTask('fetch-project', 'Fetch the project code from the remote repository, read the visIncludes.json file and fetch the corresponding visualizations. ' ['fetch-proj-files', 'fetch-proj-visuals']);
-    grunt.registerTask('register-deploy-scripts', ['folder_list']);
+    grunt.registerTask('register-deploy-scripts', [
+        //'folder_list'
+    ]);
     grunt.registerTask('clean-workspace', 'Cleans the workspace', ['clean:projects', 'clean:visualizations', 'clean:deploys', 'mkdir:workspace']);
-    grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projecturl', 'clean:project', 'mkdir:projworkspace', 'shell:createproject', 'copy:strippedframework']);
+    grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projecturl', 'mkdir:projectworkspace', 'shell:createproject', 'copy:strippedframework']);
     // TODO: The template strings do not replace the file contents. 
     grunt.registerTask('create-vis-config', ['prompt:projectname', 'prompt:visualizationname', 'prompt:visualizationalias', 'copy:vistemplate']);
     grunt.registerTask('build-project-full', ['prompt:projectname', 'prompt:projecturl', 'prompt:pluginsurl', 'build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);

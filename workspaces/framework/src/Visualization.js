@@ -144,9 +144,9 @@ var VisualizationClass = function() {
 				 * @return Object D3 canvas.
 				 * @description  Creates a graph layout with options. 
 				 */
-			out.easyGraphLayout = function(network) {
+			out.easyGraphLayout = function(network, opts) {
 					network.SVG.graphOpts = {};
-					var defaultMargin = 10;
+					var defaultMargin = 50;
 					network.SVG.graphOpts.margins = {
 						top: network.config.margins.top || defaultMargin,
 						left: network.config.margins.left || defaultMargin,
@@ -167,7 +167,7 @@ var VisualizationClass = function() {
 				 */
 			out.easyGraph = function(network, opts) {
 					network.Scales.x.range([0, network.SVG.graphOpts.width]);
-					network.Scales.y.range([network.SVG.graphOpts.height, 0]);
+					// network.Scales.y.range([network.SVG.graphOpts.height, 0]);
 					network.Scales.x1.range([network.SVG.graphOpts.wOffset, network.SVG.graphOpts.width + network.SVG.graphOpts.wOffset])
 					network.Scales.y1.range([network.SVG.graphOpts.height + network.SVG.graphOpts.hOffset, network.SVG.graphOpts.hOffset])
 					network.Scales.xAxis = d3.svg.axis()
@@ -219,7 +219,7 @@ var VisualizationClass = function() {
 					if (!network.SVG.graphArea) {
 						network.SVG.graphArea = network.SVG.graphG.append("g")
 							.attr("class", "graphArea")
-							.attr("transform", "translate(" + (xAxisTranslate * 2 + 1) + "," + (yAxisTranslate * 2 + 1) + ")")
+							.attr("transform", "translate(0," + (yAxisTranslate * 2 + 1) + ")")
 							// network.SVG.graphArea.append("rect")
 							// 	.attr("width", 20)
 							// 	.attr("height", 20)
