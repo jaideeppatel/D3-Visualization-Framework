@@ -30,8 +30,8 @@ visualizationFunctions.AngularTable = function(element, data, opts) {
 			var container = document.createElement("div");
 			container.id = "table-container";
 			container.className += "table-container"
-			var string = '<div id="' + opts.ngIdentifier + '-table" ng-controller="basicCtrl">'
-			string += '	<table st-pipe="pipeFunction" st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">'
+			var string = '<div id="' + opts.ngIdentifier + '-table" class="table-container" ng-controller="basicCtrl">'
+			string += '	<table st-set-filter="myFilter" st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">'
 			string += '		<thead>'
 			string += '		<tr>'
 			string += headerString
@@ -69,8 +69,10 @@ visualizationFunctions.AngularTable = function(element, data, opts) {
 			$(container).html($compile(string)($rootScope));
 			$(element).append(container);
 			$rootScope.$apply(function() {
+				// console.log($rootScope.$$childHead)
+				// $rootScope.$$childHead.pipeFunction();
 				$rootScope.$$childHead.setrowCollection(network.filteredData.records.data);
-				$rootScope.$$childHead.setitemsByPage(network.config.meta.table.pagination)
+				// $rootScope.$$childHead.setitemsByPage(network.config.meta.table.pagination);
 			});
 
 
@@ -79,6 +81,7 @@ visualizationFunctions.AngularTable = function(element, data, opts) {
 					angular.element('#' + opts.ngIdentifier + '-table').scope().filter(val);
 					// $('#' + opts.ngIdentifier + '-table').scope().$apply();
 				})
+				console.log($rootScope)
 			}
 			// network.applyFilter(12)
 
