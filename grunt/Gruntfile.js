@@ -22,7 +22,8 @@ module.exports = function(grunt) {
                 cors: true,
                 port: 8000,
                 nevercache: true,
-                logRequests: true
+                logRequests: true,
+                base: '../'
             },
             foo: 'bar' // For some reason an extra key with a non-object value is necessary 
         },
@@ -69,10 +70,10 @@ module.exports = function(grunt) {
         clean: {
             deploys: ['deploy/'],
             deploy: [('deploy/' + '<%= projectName %>')],
-            projects: ['workspaces/projects'],
-            project: [('workspaces/projects/' + '<%= projectName %>')],
-            visualizations: ['workspaces/visualizations/'],
-            visualization: ['workspaces/visualizations/' + '<%= projectName %>']
+            projects: ['../workspaces/projects'],
+            project: [('../workspaces/projects/' + '<%= projectName %>')],
+            visualizations: ['../workspaces/visualizations/'],
+            visualization: ['../workspaces/visualizations/' + '<%= projectName %>']
         },
         //Copies src directory to dest
         copy: {
@@ -81,31 +82,31 @@ module.exports = function(grunt) {
                 expand: true,
                 cwd: 'deploy/',
                 src: ['**/*'],
-                dest: ('backup-deploy/')
+                dest: ('../backup-deploy/')
             },
             framework: {
                 expand: true,
-                cwd: 'workspaces/framework',
+                cwd: '../workspaces/framework',
                 src: ['**/*'],
                 dest: ('deploy/' + '<%= projectName %>')
             },
             //TODO: Change name
             strippedframework: {
                 expand: true,
-                cwd: 'workspaces/framework',
+                cwd: '../workspaces/framework',
                 src: ['**/*', '!lib/*', '!src/*', 'src/tmp/', 'src/DatasourceMap.js'],
-                dest: ('workspaces/projects/' + '<%= projectName %>' + '/' + '<% visualizationName %>')
+                dest: ('../workspaces/projects/' + '<%= projectName %>' + '/' + '<% visualizationName %>')
             },
             project: {
                 expand: true,
-                cwd: ('workspaces/projects/' + '<%= projectName %>' + '/'),
+                cwd: ('../workspaces/projects/' + '<%= projectName %>' + '/'),
                 src: ['**/*'],
                 dest: ('deploy/' + '<%= projectName %>')
             },
             // Copies src files to dest
             visualizations: {
                 expand: true,
-                cwd: ('workspaces/visualizations/' + '<%= projectName %>'),
+                cwd: ('../workspaces/visualizations/' + '<%= projectName %>'),
                 src: ['**/*.js', '**/*.json', '!**/visincludes.json', '!**/*-config.js'],
                 dest: ('deploy/' + '<%= projectName %>' + '/visuals'),
                 flatten: false
@@ -114,8 +115,8 @@ module.exports = function(grunt) {
             vistemplate: {
                 expand: true,
                 // cwd: 'visualizations-workspace/' + '<%= visualizationName %>' + '/' + '<%= visualizationName %>',
-                src: ['templates/generatedVisContent/*'],
-                dest: ('workspaces/projects/' + '<%= projectName %>' + '/visuals'),
+                src: ['../templates/generatedVisContent/*'],
+                dest: ('../workspaces/projects/' + '<%= projectName %>' + '/visuals'),
                 rename: function(dest, srcPath) {
                     return dest + '/' + srcPath.replace(/\bVISALIAS\b/g, grunt.template.process('<%= projectName %>'));
                 },
@@ -137,22 +138,21 @@ module.exports = function(grunt) {
             watchcopyproject: {
                 expand: true,
                 dot: true,
-                cwd: ('workspaces/projects/' + '<%= projectName %>'),
+                cwd: ('../workspaces/projects/' + '<%= projectName %>'),
                 src: ['**/*.*', '!.git/'],
                 dest: ('deploy/' + '<%= projectName %>')
             },
             watchcopyframework: {
                 expand: true,
                 dot: true,
-                cwd: ('workspaces/framework/'),
+                cwd: ('../workspaces/framework/'),
                 src: ['**/*.*', '!.git/'],
-                //TODO: This doesn't point to the correct location .Fix and test.
                 dest: ('deploy/' + '<%= projectName %>'),
             },
             watchcopyvisualizations: {
                 expand: true,
                 dot: true,
-                cwd: ('workspaces/visualizations/' + '<%= projectName %>'),
+                cwd: ('../workspaces/visualizations/' + '<%= projectName %>'),
                 src: ['**/*.*', '!.git/'],
                 //TODO: This doesn't point to the correct location .Fix and test.
                 dest: ('deploy/' + '<%= projectName %>' + '/visuals'),
@@ -162,26 +162,11 @@ module.exports = function(grunt) {
         //Newer is a task that compares timestamps of two compared files and runs tasks if the compared file is
         watch: {
             project: {
-                files: ['**/*.*'],
-                tasks: ['newer:copy:watchcopyframework', 'newer:copy:watchcopyproject'],
+                files: ['framework/**/*.*', 'projects/**/*.*', 'visualizations/**/*.*'],
+                tasks: ['newer:copy:watchcopyframework', 'newer:copy:watchcopyproject', 'newer:copy:watchcopyvisualizations'],
                 options: {
                     spawn: false,
-                    cwd: ('workspaces/projects/' + '<%= projectName %>'),
-                    livereload: true
-                },
-            },
-            visualizations: {
-                files: ['**/*.*'],
-                tasks: ['newer:copy:watchcopyvisualizations'],
-                options: {
-                    spawn: false,
-                    cwd: ('workspaces/visualizations/' + '<%= projectName %>'),
-                },
-            },
-            main: {
-                files: ['workspaces/framework/*.*', ''],
-                options: {
-                    cwd: ('deploy/' + '<%= projectName %>'),
+                    cwd: ('../workspaces/'),
                     livereload: true
                 },
             },
@@ -303,22 +288,22 @@ module.exports = function(grunt) {
         mkdir: {
             workspace: {
                 options: {
-                    create: ['deploy', 'workspaces/projects', 'workspaces/visualizations']
+                    create: ['deploy', '../workspaces/projects', '../workspaces/visualizations']
                 },
             },
             visworkspace: {
                 options: {
-                    create: ['workspaces/visualizations']
+                    create: ['../workspaces/visualizations']
                 },
             },
             projectworkspace: {
                 options: {
-                    create: ['workspaces/projects/<%= projectName %>']
+                    create: ['../workspaces/projects/<%= projectName %>']
                 },
             },
             projectvisualizationworkspace: {
                 options: {
-                    create: ['workspaces/visualizations/<%= projectName %>']
+                    create: ['../workspaces/visualizations/<%= projectName %>']
                 },
             },
         },
@@ -326,7 +311,7 @@ module.exports = function(grunt) {
             dist: {
                 src: ['deploy/**/*.js', '!deploy/**/lib/*.js'],
                 options: {
-                    destination: 'doc',
+                    destination: '../doc',
                     // template : 'node_modules/ink-docstrap/template',
                     // configure : 'node_modules/ink-docstrap/template/jsdoc.conf.json'
                 }
@@ -342,9 +327,8 @@ module.exports = function(grunt) {
     });
     grunt.initConfig(config);
 
-    grunt.registerTask('watch-proj', ['watch:project', 'watch:main']);
+    grunt.registerTask('watch-proj', ['watch:project']);
     grunt.registerTask('watch-vis', ['watch:visualizations']);
-    grunt.registerTask('watch-proj-and-vis', ['watch-proj', 'watch-vis']);
     grunt.registerTask('build-project-files', ['mkdir:projectworkspace', 'shell:initproject']);
     grunt.registerTask('set-config-file', function() {
         if (grunt.option('config-dir')) {
@@ -357,7 +341,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build-project-visualizations', function() {
         var projectName = grunt.template.process('<%= projectName %>');
         var pluginsURL = grunt.template.process('<%= pluginsURL %>');
-        var obj = grunt.file.readJSON(('workspaces/projects/' + projectName + '/visuals/visincludes.json'));
+        var obj = grunt.file.readJSON(('../workspaces/projects/' + projectName + '/visuals/visincludes.json'));
         grunt.task.run(['mkdir:projectvisualizationworkspace'])
             //TODO: Don't append tasks to config, then run them like a bozo.
         Object.keys(obj.data).forEach(function(d, i) {
@@ -375,7 +359,7 @@ module.exports = function(grunt) {
                 options: {
                     execOptions: {
                         stderr: false,
-                        cwd: ('workspaces/visualizations/' + projectName)
+                        cwd: ('../workspaces/visualizations/' + projectName)
                     }
                 }
             }
@@ -399,7 +383,7 @@ module.exports = function(grunt) {
             options: {
                 execOptions: {
                     stderr: false,
-                    cwd: ('workspaces/visualizations/' + projectName)
+                    cwd: ('../workspaces/visualizations/' + projectName)
                 }
             }
         }

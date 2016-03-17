@@ -9,7 +9,6 @@
  * @description Predefined options for visualization alignment and creation. Contains basic custom layouts and easy configurations.
  */
 
-
 var VisualizationClass = function() {
 	/**
 	 * @memberOf  VisualizationClass
@@ -368,7 +367,7 @@ var VisualizationClass = function() {
 			try {
 				//TODO: Need to remove Leaflet somehow. 
 				this.SVG.selectAll("*").remove();
-				$(this.AngularArgs.element[0]).empty()
+				// $(this.AngularArgs.element[0]).empty()
 					// this.AngularArgs.element[0].innerHTML = "";
 
 			} catch (exception) {}

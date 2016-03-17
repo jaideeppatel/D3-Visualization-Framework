@@ -5,7 +5,6 @@
  */
 var app = angular.module('app', [])
 
-
 app.service('Data', ['$rootScope', '$http', function($rootScope, $http) {
     /**
      * @namespace  service
