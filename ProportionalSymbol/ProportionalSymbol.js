@@ -5,7 +5,7 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 	network.VisFunc = function() {
 		var data = network.AngularArgs.data.get("records");
 
-		var categories = ['lat'];
+		var categories = ['name'];
 		var categoryBank = {};
 
 		categories.forEach(function(category) {
@@ -18,6 +18,11 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 						if (d.type == "numeric") {
 							obj[d.name] = d3.mean(leaves, function(d1) {
 								return d1[d.name];
+							})
+						} else {
+							obj[d.name] = "";
+							leaves.forEach(function(d1) {
+								obj[d.name] += d1[d.name]
 							})
 						}
 					})
@@ -40,15 +45,12 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 		network.SVG = d3.select(element[0]).select("svg");
 		network.leaflet.map.on("viewreset", update);
 
-		var circ = network.SVG.append("circle")
-			.attr("r", 12)
-
 		network.Scales.rScale = d3.scale.linear()
 			.domain([0, 100])
 			.range([2, 12])
 
 		network.SVG.nodes = network.SVG.selectAll(".circle")
-			.data(categoryBank.lat)
+			.data(categoryBank[categories[0]])
 			.enter()
 			.append("circle")
 			.attr("class", function(d, i) {
@@ -72,17 +74,14 @@ visualizationFunctions.ProportionalSymbol = function(element, data, opts) {
 					return "translate(" + x + "," + y + ")";
 				}).on("click", function(d) {
 					d.popupContent = [];
-					d.popupString = "<h3>Title Placeholder</h3><table>";
-					console.log(network.config)
+					d.popupString = "<h3 style='color:black'>" + d.key + "</h3><table>";
 					Object.keys(network.config.meta.nodes.popup.content).forEach(function(d1, i1) {
 						var string = "<tr>";
 						string += "<td>" + network.config.meta.nodes.popup.content[d1].prettyLabel + "</td>"
 						string += "<td>" + d.values[d1] + "</td></tr>"
-						console.log(network.config.meta.nodes.popup.content[d1].prettyLabel)
 						d.popupString += string;
 					})
 					d.popupString += "</table>"
-					console.log(d.popupString)
 					var popup = L.marker(network.leaflet.map.layerPointToLatLng(network.leaflet.map.latLngToLayerPoint({
 						"lat": d.values.lat || 0,
 						"lng": d.values.lng || 0
