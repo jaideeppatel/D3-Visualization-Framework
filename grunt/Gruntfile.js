@@ -23,7 +23,7 @@ module.exports = function(grunt) {
                 port: 8000,
                 nevercache: true,
                 logRequests: true,
-                base: '../'
+                base: '../deploy'
             },
             foo: 'bar' // For some reason an extra key with a non-object value is necessary 
         },

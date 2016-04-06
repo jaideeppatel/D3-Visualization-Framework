@@ -120,6 +120,8 @@ var VisualizationClass = function() {
 			out.dims.height = (this.AngularArgs.opts.ngHeight || $(this.AngularArgs.element[0]).height());
 			out.dims.fixedWidth = out.dims.width - out.margins.left - out.margins.right;
 			out.dims.fixedHeight = out.dims.height - out.margins.top - out.margins.bottom;
+			var that = this;
+
 			/**
 			 * @memberOf CreateBaseConfig
 			 * @type Function
@@ -129,12 +131,18 @@ var VisualizationClass = function() {
 			 */
 			out.easySVG = function(selector, args) {
 					args = args || {};
-					return d3.select(selector)
+					base =  d3.select(selector)
 						.append("svg")
-						.attr("transform", "translate(" + out.margins.left + "," + out.margins.top + ")")
-						.attr("width", args.width || out.dims.width)
-						.attr("height", args.height || out.dims.height)
-						.attr("background", "white");
+						// .attr("width", args.width || out.dims.width)
+						// .attr("height", args.height || out.dims.height)
+						.attr("background", "white")
+						.attr("preserveAspectRatio", "xMinYMin meet")
+						.attr("viewBox", "0 0 " + this.dims.fixedWidth + " " + this.dims.fixedHeight)
+						.classed("canvas " + that.AngularArgs.opts.ngIdentifier, true)
+
+						.classed("svg-container", true) //container class to make it responsive
+						.classed("svg-content-responsive", true)
+					return base.append("g")
 				}
 				/**
 				 * @memberOf CreateBaseConfig
@@ -367,7 +375,7 @@ var VisualizationClass = function() {
 			try {
 				//TODO: Need to remove Leaflet somehow. 
 				this.SVG.selectAll("*").remove();
-				// $(this.AngularArgs.element[0]).empty()
+				$(this.AngularArgs.element[0]).empty()
 					// this.AngularArgs.element[0].innerHTML = "";
 
 			} catch (exception) {}
@@ -465,7 +473,14 @@ var VisualizationClass = function() {
 			}, 200);
 			return that;
 		},
-
+	/**
+	 * @memberOf CreateBaseConfig
+	 * @type Function
+	 * @property {Object} element 
+	 * @property {Object} data
+	 * @property {Object} opts
+	 * @description Binds the arguments to this. Creates an immutable map of the data argument. If data is not found, create an empty data object. Sets either "nodes" or "records" for easier implementation into a visualization.
+	 */
 		this.SetAngularArgs = function(element, data, opts) {
 			this.AngularArgs.element = element;
 			this.AngularArgs.data = Immutable.Map(data) || Immutable.Map({
@@ -484,9 +499,21 @@ var VisualizationClass = function() {
 			if (data.topology == "table") this.PrimaryDataAttr = "records";
 			this.AngularArgs.opts = opts;
 		},
+	/**
+	 * @memberOf CreateBaseConfig
+	 * @type Function
+	 * @property {Object} element
+	 * @description Binds the Angular element to this. 
+	 */		
 		this.SetAngularElement = function(element) {
 			this.AngularArgs.element = element;
 		},
+	/**
+	 * @memberOf CreateBaseConfig
+	 * @type Function
+	 * @property {Object} element
+	 * @description Creates an immutable map of the data argument. If data is not found, create an empty data object. Sets either "nodes" or "records" for easier implementation into a visualization.
+	 */				
 		this.SetAngularData = function(data) {
 			this.AngularArgs.data = Immutable.Map(data) || Immutable.Map({
 				nodes: {
@@ -506,9 +533,20 @@ var VisualizationClass = function() {
 			if (data.topology == "graph") this.PrimaryDataAttr = "nodes";
 			if (data.topology == "table") this.PrimaryDataAttr = "records";
 		},
+	/**
+	 * @memberOf CreateBaseConfig
+	 * @type Function
+	 * @property {Object} opts Contains the properties bound to the DOM element (ex:"ng-identifier")
+	 * @description Binds the Angular opts to this. 
+	 */	
 		this.SetAngularOpts = function(opts) {
 			this.AngularArgs.opts = opts;
 		},
+	/**
+	 * @memberOf CreateBaseConfig
+	 * @type Function
+	 * @description Default update behavior for a visualization. 
+	 */			
 		this.Update = function() {
 			this.RunVis();
 		}

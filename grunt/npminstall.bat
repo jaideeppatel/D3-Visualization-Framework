@@ -1,1 +1,1 @@
-start cmd.exe /k "npm install --save"
+start cmd.exe /k "npm install"
