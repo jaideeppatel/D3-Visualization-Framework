@@ -130,19 +130,26 @@ var VisualizationClass = function() {
 			 * @description  Creates simple D3 canvas with base configuration.
 			 */
 			out.easySVG = function(selector, args) {
-					args = args || {};
-					base =  d3.select(selector)
+					args = args || { responsive: true };
+					that.SVGBase = d3.select(selector)
 						.append("svg")
-						// .attr("width", args.width || out.dims.width)
-						// .attr("height", args.height || out.dims.height)
-						.attr("background", "white")
-						.attr("preserveAspectRatio", "xMinYMin meet")
-						.attr("viewBox", "0 0 " + this.dims.fixedWidth + " " + this.dims.fixedHeight)
 						.classed("canvas " + that.AngularArgs.opts.ngIdentifier, true)
+						.attr("background", "white")
+
+					if (args.responsive) {
+						that.SVGBase
+							.attr("preserveAspectRatio", "xMinYMin meet")
+							.attr("viewBox", "0 0 " + this.dims.fixedWidth + " " + this.dims.fixedHeight)
 
 						.classed("svg-container", true) //container class to make it responsive
-						.classed("svg-content-responsive", true)
-					return base.append("g")
+							.classed("svg-content-responsive", true)
+					} else {
+						that.SVGBase
+							.attr("width", args.width || out.dims.width)
+							.attr("height", args.height || out.dims.height)
+
+					}
+					return that.SVGBase.append("g")
 				}
 				/**
 				 * @memberOf CreateBaseConfig
@@ -173,14 +180,14 @@ var VisualizationClass = function() {
 				 * @description  Creates a graph with options. Offsets graph area to allow for axis margins. Adds axis labels. 
 				 */
 			out.easyGraph = function(network, opts) {
-					network.Scales.x.range([0, network.SVG.graphOpts.width]);
+					network.Scales.x.range([0, network.SVG.graphOpts.width - 20]);
 					// network.Scales.y.range([network.SVG.graphOpts.height, 0]);
 					network.Scales.x1.range([network.SVG.graphOpts.wOffset, network.SVG.graphOpts.width + network.SVG.graphOpts.wOffset])
 					network.Scales.y1.range([network.SVG.graphOpts.height + network.SVG.graphOpts.hOffset, network.SVG.graphOpts.hOffset])
 					network.Scales.xAxis = d3.svg.axis()
 						.scale(opts.x.scale1)
 						.orient(opts.x.orient || "bottom")
-						.tickSize(5);
+						// .tickSize(5);
 					network.Scales.yAxis = d3.svg.axis()
 						.scale(opts.y.scale1)
 						.tickSize(network.SVG.graphOpts.width)
@@ -258,7 +265,7 @@ var VisualizationClass = function() {
 
 					network.SVG.graphG.title = network.SVG.graphG
 						.append("text")
-						.attr("class", "l")
+						// .attr("class", "l")
 						.attr("transform", "translate(" + (network.SVG.graphOpts.width / 2) + "," + tLabelTranslate + ")")
 						.attr("text-anchor", "middle")
 						.text(opts.t.label)
@@ -372,13 +379,16 @@ var VisualizationClass = function() {
 		 * @description  Removes all elements from the base selector.
 		 */
 		this.ClearVis = function() {
+			that = this;
 			try {
 				//TODO: Need to remove Leaflet somehow. 
-				this.SVG.selectAll("*").remove();
+				that.SVG.selectAll("*").remove();
 				$(this.AngularArgs.element[0]).empty()
-					// this.AngularArgs.element[0].innerHTML = "";
+				this.AngularArgs.element[0].innerHTML = "";
 
-			} catch (exception) {}
+			} catch (exception) {
+				// console.log(exception)
+			}
 			return this;
 		},
 
@@ -473,14 +483,14 @@ var VisualizationClass = function() {
 			}, 200);
 			return that;
 		},
-	/**
-	 * @memberOf CreateBaseConfig
-	 * @type Function
-	 * @property {Object} element 
-	 * @property {Object} data
-	 * @property {Object} opts
-	 * @description Binds the arguments to this. Creates an immutable map of the data argument. If data is not found, create an empty data object. Sets either "nodes" or "records" for easier implementation into a visualization.
-	 */
+		/**
+		 * @memberOf CreateBaseConfig
+		 * @type Function
+		 * @property {Object} element 
+		 * @property {Object} data
+		 * @property {Object} opts
+		 * @description Binds the arguments to this. Creates an immutable map of the data argument. If data is not found, create an empty data object. Sets either "nodes" or "records" for easier implementation into a visualization.
+		 */
 		this.SetAngularArgs = function(element, data, opts) {
 			this.AngularArgs.element = element;
 			this.AngularArgs.data = Immutable.Map(data) || Immutable.Map({
@@ -499,21 +509,21 @@ var VisualizationClass = function() {
 			if (data.topology == "table") this.PrimaryDataAttr = "records";
 			this.AngularArgs.opts = opts;
 		},
-	/**
-	 * @memberOf CreateBaseConfig
-	 * @type Function
-	 * @property {Object} element
-	 * @description Binds the Angular element to this. 
-	 */		
+		/**
+		 * @memberOf CreateBaseConfig
+		 * @type Function
+		 * @property {Object} element
+		 * @description Binds the Angular element to this. 
+		 */
 		this.SetAngularElement = function(element) {
 			this.AngularArgs.element = element;
 		},
-	/**
-	 * @memberOf CreateBaseConfig
-	 * @type Function
-	 * @property {Object} element
-	 * @description Creates an immutable map of the data argument. If data is not found, create an empty data object. Sets either "nodes" or "records" for easier implementation into a visualization.
-	 */				
+		/**
+		 * @memberOf CreateBaseConfig
+		 * @type Function
+		 * @property {Object} element
+		 * @description Creates an immutable map of the data argument. If data is not found, create an empty data object. Sets either "nodes" or "records" for easier implementation into a visualization.
+		 */
 		this.SetAngularData = function(data) {
 			this.AngularArgs.data = Immutable.Map(data) || Immutable.Map({
 				nodes: {
@@ -533,20 +543,20 @@ var VisualizationClass = function() {
 			if (data.topology == "graph") this.PrimaryDataAttr = "nodes";
 			if (data.topology == "table") this.PrimaryDataAttr = "records";
 		},
-	/**
-	 * @memberOf CreateBaseConfig
-	 * @type Function
-	 * @property {Object} opts Contains the properties bound to the DOM element (ex:"ng-identifier")
-	 * @description Binds the Angular opts to this. 
-	 */	
+		/**
+		 * @memberOf CreateBaseConfig
+		 * @type Function
+		 * @property {Object} opts Contains the properties bound to the DOM element (ex:"ng-identifier")
+		 * @description Binds the Angular opts to this. 
+		 */
 		this.SetAngularOpts = function(opts) {
 			this.AngularArgs.opts = opts;
 		},
-	/**
-	 * @memberOf CreateBaseConfig
-	 * @type Function
-	 * @description Default update behavior for a visualization. 
-	 */			
+		/**
+		 * @memberOf CreateBaseConfig
+		 * @type Function
+		 * @description Default update behavior for a visualization. 
+		 */
 		this.Update = function() {
 			this.RunVis();
 		}
