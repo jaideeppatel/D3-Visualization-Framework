@@ -199,7 +199,14 @@ visualizationFunctions.Sankey = function(element, data, opts) {
             })
             .on("mouseout", function(d, i) {
                 network.SVG.edges.classed("selected", false)
-            })                        
+            })
+            // .each(function(d, i) {
+            //     var col = tempColors(i);
+            //     d.sourceLinks.forEach(function(d1, i1) {
+            //         console.log(d3.selectAll("." + d1.uid).attr("stroke", col))
+            //         // d3.select(d1).attr("stroke", col)
+            //     })
+            // })              
             // .on("click", highlight_node_links)
 
         .call(d3.behavior.drag()
