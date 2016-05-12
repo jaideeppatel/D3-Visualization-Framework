@@ -4,7 +4,6 @@ visualizationFunctions.AngularTable = function(element, data, opts) {
 	network.config = network.CreateBaseConfig();
 	network.meta = network.config.meta;
 	network.VisFunc = function() {
-		// var data = network.AngularArgs.data.get("").data;
 		Utilities.runJSONFuncs(network.config.meta, [data, network.config]);
 
 		var headerString = "";
@@ -30,7 +29,7 @@ visualizationFunctions.AngularTable = function(element, data, opts) {
 			var container = document.createElement("div");
 			container.id = "table-container";
 			container.className += "table-container"
-			var string = '<div id="' + opts.ngIdentifier + '-table" class="table-container" ng-controller="basicCtrl">'
+			var string = '<div id="' + opts.ngIdentifier + '-table" class="angular-table table-container" ng-controller="basicCtrl">'
 			string += '	<table st-set-filter="myFilter" st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">'
 			string += '		<thead>'
 			string += '		<tr>'
@@ -69,33 +68,14 @@ visualizationFunctions.AngularTable = function(element, data, opts) {
 			$(container).html($compile(string)($rootScope));
 			$(element).append(container);
 			$rootScope.$apply(function() {
-				// console.log($rootScope.$$childHead)
-				// $rootScope.$$childHead.pipeFunction();
 				$rootScope.$$childHead.setrowCollection(network.filteredData.records.data);
-				// $rootScope.$$childHead.setitemsByPage(network.config.meta.table.pagination);
 			});
-
 
 			network.applyFilter = function(val) {
 				$rootScope.$apply(function() {
 					angular.element('#' + opts.ngIdentifier + '-table').scope().filter(val);
-					// $('#' + opts.ngIdentifier + '-table').scope().$apply();
 				})
-				console.log($rootScope)
 			}
-			// network.applyFilter(12)
-
-
-			// document.getElementById("qwertyasdf").setAttribute("st-search", 12);
-			// // document.getElementById("qwertyasdf").setAttribute("value", 12).change();			
-			// $("#qwertyasdf").val(121).change()
-			// $("#qwertyasdf").attr("st-search", 121).change()
-			// setTimeout(function() {
-			// 	$("#qwertyasdf").scope().$apply();
-			// 	$("#qwertyasdf").scope().$digest();
-			// 	$rootScope.$apply();
-			// 	$rootScope.$digest();
-			// }, 1000)	
 		});
 	}
 	return network;

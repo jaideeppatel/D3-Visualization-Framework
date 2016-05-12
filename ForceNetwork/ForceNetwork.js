@@ -4,12 +4,10 @@ visualizationFunctions.ForceNetwork = function(element, data, opts) {
 	network.config = network.CreateBaseConfig();
 
 	network.SVG = network.config.easySVG(element[0])
-		.attr("background", "white")
-		.attr("class", "canvas " + opts.ngIdentifier)
-		.append("g")
-		.attr("transform", "translate(" + (network.config.margins.left + network.config.dims.width / 2) + "," + (network.config.margins.top + network.config.dims.height / 2) + ")")
+		.attr("transform", "translate(" + (network.config.margins.left + network.config.dims.width / 2) + "," + (network.config.margins.top + network.config.dims.height / 2) + ")")		
 	network.meta = network.config.meta;
 	network.VisFunc = function() {
+
 		// This is to add a clickable background. The opacity MUST be greater than 0 to register a click. We don't want it overriding any background elements, so it's just baaaarely visible.
 		network.SVG.background = network.SVG.append("rect")
 			.attr("x", -(network.config.margins.left + network.config.dims.width / 2))
