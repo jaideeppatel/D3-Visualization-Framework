@@ -2,27 +2,16 @@ visualizationFunctions.BarGraphDistort = function(element, data, opts) {
     var network = visualizations[opts.ngIdentifier];
     network.parentVis = visualizations[opts.ngComponentFor];
     network.config = network.CreateBaseConfig();
-<<<<<<< HEAD
-    network.config.margins.left2 = network.config.margins.left;
-=======
-    network.SVGBase = network.config.easySVG(element[0])
-        .attr('background', 'white')
-        .attr('class', 'canvas ' + opts.ngIdentifier)
-        .style("overflow", "scroll")
-    network.SVG = network.SVGBase.append("g")
-        .attr('transform', 'translate(' + (network.config.margins.left) + ',' + (network.config.margins.top) + ')')
->>>>>>> 581294d8bc9c45911de03efb85543f8e7283ce82
-    network.VisFunc = function() {
-        network.config = network.CreateBaseConfig();
-        network.config.margins.left = network.config.margins.left2;
         network.SVG = network.config.easySVG(element[0], {responsive:false})
             .attr('background', 'white')
             .attr('class', 'canvas ' + opts.ngIdentifier)
             .attr('transform', 'translate(' + (network.config.margins.left || 0) + ',' + (network.config.margins.top) + ')')
+    network.VisFunc = function() {
         var useData = network.filteredData[network.PrimaryDataAttr].data;
         var barHeight = 20;
-        network.SVGBase.attr("height", useData.length * (barHeight) + barHeight * 2)
-        network.SVG.attr("height", useData.length * (barHeight) + barHeight * 2)
+        // network.SVG.attr("height", useData.length * (barHeight) + barHeight * 2)
+        network.SVGBase.attr("height", useData.length * (barHeight) + barHeight * 2 + barHeight * 2)
+        network.SVG.attr("height", useData.length * (barHeight) + barHeight * 2 + barHeight * 2)
 
         network.Scales.xScaleOffset = 0;
         if (network.config.meta[network.PrimaryDataAttr].styleEncoding.size.scale == "log") {
@@ -38,18 +27,8 @@ visualizationFunctions.BarGraphDistort = function(element, data, opts) {
         network.Scales.y = d3.scale.linear()
             .domain([0, 1])
             .range([0, parseInt(network.SVG.attr("height"))])
-<<<<<<< HEAD
-        network.Scales.y1 = network.Scales.y
-        var tip = d3.tip()
-            .attr('class', 'd3-tip')
-            .offset([-10, 0])
-            .html(function(d) {
-                return "<strong>Frequency:</strong> <span style='color:red'>" + d.frequency + "</span>";
-            })
-=======
         network.Scales.y1 = network.Scales.y;
 
->>>>>>> 581294d8bc9c45911de03efb85543f8e7283ce82
         network.config.margins.left = 150;
         network.config.easyGraphLayout(network);
         network.config.easyGraph(network, {
@@ -79,8 +58,7 @@ visualizationFunctions.BarGraphDistort = function(element, data, opts) {
                 .append("g")
                 .attr("transform", function(d, i) {
                     return "translate(1, " + (20 * i) + ")"
-                })                .on('mouseover', tip.show)
-                .on('mouseout', tip.hide)
+                })
 
             network.SVG.bar = network.SVG.barG.append("rect")
                 .attr("class", function(d, i) {
@@ -88,6 +66,7 @@ visualizationFunctions.BarGraphDistort = function(element, data, opts) {
                 })
                 .attr("width", 20)
                 .attr("height", barHeight - 1)
+                .attr("fill", "green")
             network.SVG.barText = network.SVG.barG.append("text")
                 .attr("x", -4)
                 .attr("y", barHeight * .75)
