@@ -14,6 +14,15 @@ module.exports = function(grunt) {
         });
         return object;
     }
+
+    grunt.config.data.baseURL = grunt.option('baseURL')
+    grunt.config.data.commitID = grunt.option('visualizationAlias')
+    grunt.config.data.pluginsURL = grunt.option('pluginsURL')
+    grunt.config.data.projectName = grunt.option('projectName')
+    grunt.config.data.projectURL = grunt.option('projectURL')
+    grunt.config.data.visualizationAlias = grunt.option('visualizationAlias')
+    grunt.config.data.visualizationName = grunt.option('visualizationName')
+
     var path = require('path');
     var config = {
         pkg: grunt.file.readJSON('package.json'),
@@ -27,45 +36,7 @@ module.exports = function(grunt) {
             },
             foo: 'bar' // For some reason an extra key with a non-object value is necessary 
         },
-        //Shell scripts
-        shell: {
-            //Creates a directory with the name of the 'project' parameter
-            //Moves into the new directory
-            //Creates a git project
-            //Enables and configures sparseCheckout
-            //Adds the 'project' parameter to the sparseCheckout (so we only check out the right project).
-            //Adds the remote repository
-            //Fetches and resets the remote repository
-            //TODO: This might change to a full checkout from an exclusive repo so clients cannot bleed into other projects
-            initproject: {
-                command: [
-                    'git init',
-                    'git remote add -f origin ' + '<%= projectURL %>',
-                    ('git fetch origin ' + ('<%= commitID %>' || 'master')),
-                    'git reset --hard FETCH_HEAD'
-                ].join('&&')
-            },
-            //Creates a new project. Must be checked into the remote repository before performing a full build
-            //Creates a directory with the name of the 'project' parameter
-            //Moves into the new directory
-            //Creates a git project
-            //Enables and configures sparseCheckout
-            //Adds the 'project' parameter to the sparseCheckout (so we only check out the right project).
-            //Adds the remote repository
-            createproject: {
-                //TODO: If projecturl options is not specified, ignore
-                command: [
-                    'git init',
-                    'git remote add -f origin <%= projectURL %>'
-                ].join('&&')
-            },
-            options: {
-                execOptions: {
-                    stderr: false,
-                    cwd: 'workspaces/projects/<%= projectName %>'
-                }
-            }
-        },
+        shell: {},
         // Deletes specified folders.
         clean: {
             deploys: ['deploy/'],
@@ -73,24 +44,19 @@ module.exports = function(grunt) {
             projects: ['../workspaces/projects'],
             project: [('../workspaces/projects/' + '<%= projectName %>')],
             visualizations: ['../workspaces/visualizations/'],
-            visualization: ['../workspaces/visualizations/' + '<%= projectName %>']
+            visualization: ['../workspaces/visualizations/' + '<%= projectName %>'],
+            options: {
+                force: true
+            }
         },
         //Copies src directory to dest
         copy: {
-            //TODO: Nah. Big copy, big hassle, no time
-            backupdeploy: {
-                expand: true,
-                cwd: 'deploy/',
-                src: ['**/*'],
-                dest: ('../backup-deploy/')
-            },
             framework: {
                 expand: true,
                 cwd: '../workspaces/framework',
                 src: ['**/*'],
                 dest: ('deploy/' + '<%= projectName %>')
             },
-            //TODO: Change name
             strippedframework: {
                 expand: true,
                 cwd: '../workspaces/framework',
@@ -319,17 +285,18 @@ module.exports = function(grunt) {
         },
     }
 
+
     grunt.loadTasks('tasks');
     //Load all tasks in array
-    ['grunt-jsdoc', 'grunt-peon-gui', 'grunt-shell', 'grunt-contrib-copy', 'grunt-contrib-clean', 'grunt-contrib-jshint', 'grunt-contrib-watch', 'grunt-jslint', 'grunt-jsbeautifier', 'grunt-folder-list', 'grunt-web-server', 'grunt-contrib-watch', 'grunt-newer', 'grunt-prompt', 'grunt-mkdir', 'grunt-available-tasks']
-    .forEach(function(d) {
+    ['grunt-jsdoc', 'grunt-peon-gui', 'grunt-shell', 'grunt-contrib-copy',
+        'grunt-contrib-clean', 'grunt-contrib-jshint', 'grunt-contrib-watch',
+        'grunt-jslint', 'grunt-jsbeautifier', 'grunt-folder-list', 'grunt-web-server',
+        'grunt-contrib-watch', 'grunt-newer', 'grunt-prompt', 'grunt-mkdir', 'grunt-available-tasks'
+    ].forEach(function(d) {
         grunt.loadNpmTasks(d);
     });
     grunt.initConfig(config);
-
-    grunt.registerTask('watch-proj', ['watch:project']);
-    grunt.registerTask('watch-vis', ['watch:visualizations']);
-    grunt.registerTask('build-project-files', ['mkdir:projectworkspace', 'shell:initproject']);
+    var shell = require('shelljs');
     grunt.registerTask('set-config-file', function() {
         if (grunt.option('config-dir')) {
             var obj = grunt.file.readJSON(grunt.option('config-dir'));
@@ -341,29 +308,33 @@ module.exports = function(grunt) {
     grunt.registerTask('build-project-visualizations', function() {
         var projectName = grunt.template.process('<%= projectName %>');
         var pluginsURL = grunt.template.process('<%= pluginsURL %>');
-        var obj = grunt.file.readJSON(('../workspaces/projects/' + projectName + '/visuals/visincludes.json'));
         grunt.task.run(['mkdir:projectvisualizationworkspace'])
-            //TODO: Don't append tasks to config, then run them like a bozo.
+        var obj = grunt.file.readJSON(('../workspaces/projects/' + projectName + '/visuals/visincludes.json'));
         Object.keys(obj.data).forEach(function(d, i) {
-            grunt.config.data.shell[obj.data[d].visualization] = {
+            grunt.config.data.mkdir['projectvisualization' + obj.data[d].visualization] = {
+                options: {
+                    create: ['../workspaces/visualizations/' + projectName + '/' + obj.data[d].visualization]
+                }
+            }
+            grunt.config.data.shell['initprojectvisualizations' + obj.data[d].visualization] = {
                 command: [
-                    'mkdir ' + obj.data[d].visualization,
-                    'cd ' + obj.data[d].visualization,
                     'git init',
                     'git config core.sparseCheckout true',
                     'echo ' + obj.data[d].visualization + '/*>> .git/info/sparse-checkout',
                     'git remote add -f origin ' + pluginsURL,
-                    'git fetch origin ' + obj.data[d].commit || 'master',
+                    'git fetch origin ' + (obj.data[d].commit || 'master'),
                     'git reset --hard FETCH_HEAD'
                 ].join('&&'),
                 options: {
                     execOptions: {
                         stderr: false,
-                        cwd: ('../workspaces/visualizations/' + projectName)
+                        cwd: '../workspaces/visualizations/' + projectName + '/' + obj.data[d].visualization
                     }
                 }
             }
-            grunt.task.run(['shell:' + obj.data[d].visualization])
+            grunt.task.run(['mkdir:projectvisualization' + obj.data[d].visualization])
+            grunt.task.run(['shell:initprojectvisualizations' + obj.data[d].visualization])
+
         });
     });
     grunt.registerTask('create-visualization', function() {
@@ -371,38 +342,142 @@ module.exports = function(grunt) {
         var pluginsURL = grunt.template.process('<%= pluginsURL %>');
         var visualizationName = grunt.template.process('<%= visualizationName %>');
         grunt.task.run(['mkdir:projectvisualizationworkspace'])
-        grunt.config.data.shell[visualizationName] = {
-            command: [
-                'mkdir ' + visualizationName,
-                'cd ' + visualizationName,
-                'git init',
-                'git config core.sparseCheckout true',
-                'echo ' + visualizationName + '/*>> .git/info/sparse-checkout',
-                'git remote add -f origin ' + pluginsURL
-            ].join('&&'),
-            options: {
-                execOptions: {
-                    stderr: false,
-                    cwd: ('../workspaces/visualizations/' + projectName)
-                }
-            }
-        }
-        grunt.task.run(['shell:' + visualizationName])
+        shell.exec([
+            'cd ../workspaces/visualizations/' + projectName,
+            'mkdir ' + visualizationName,
+            'cd ' + visualizationName,
+            'git init',
+            'git config core.sparseCheckout true',
+            'echo ' + visualizationName + '/*>> .git/info/sparse-checkout',
+            'git remote add -f origin ' + pluginsURL,
+            'git reset --hard FETCH_HEAD'
+        ].join('&&'));
     });
+    //Creates a directory with the name of the 'project' parameter
+    //Moves into the new directory
+    //Creates a git project
+    //Enables and configures sparseCheckout
+    //Adds the 'project' parameter to the sparseCheckout (so we only check out the right project).
+    //Adds the remote repository
+    //Fetches and resets the remote repository
     grunt.task.run(['set-config-file']);
+    grunt.registerTask('initproject', function() {
+        var projectName = grunt.template.process('<%= projectName %>');
+        var projectURL = grunt.template.process('<%= projectURL %>');
+        var commitID = grunt.template.process('<%= commitID %>');
+        shell.exec([
+            'cd ../workspaces/projects/' + projectName,
+            'git init',
+            'git remote add -f origin ' + projectURL,
+            ('git fetch origin ' + (commitID || 'master')),
+            'git reset --hard FETCH_HEAD'
+        ].join('&&'));
+    });
+    grunt.registerTask('register-deploy-scripts', [ /*'folder_list'*/ ]);
+    grunt.registerTask('watch-proj', ['watch:project']);
+    grunt.registerTask('watch-vis', ['watch:visualizations']);
+    grunt.registerTask('build-project-files', ['mkdir:projectworkspace', 'initproject']);
     grunt.registerTask('create-project-visualization', ['prompt:projectname', 'prompt:pluginsurl', 'prompt:visualizationname', 'create-visualization'])
     grunt.registerTask('fetch-proj-files', ['prompt:projectname', 'prompt:projecturl', 'clean:project', 'mkdir:projectworkspace', 'build-project-files']);
     grunt.registerTask('fetch-proj-visuals', ['prompt:projectname', 'prompt:pluginsurl', 'clean:visualization', 'mkdir:visworkspace', 'build-project-visualizations']);
     grunt.registerTask('build-framework', 'Clean the directory and copy the framework code to the deployment directory.', ['prompt:projectname', 'clean:deploy', 'copy:framework']);
     grunt.registerTask('fetch-project', 'Fetch the project code from the remote repository, read the visIncludes.json file and fetch the corresponding visualizations. ' ['fetch-proj-files', 'fetch-proj-visuals']);
-    grunt.registerTask('register-deploy-scripts', [
-        //'folder_list'
-    ]);
     grunt.registerTask('clean-workspace', 'Cleans the workspace', ['clean:projects', 'clean:visualizations', 'clean:deploys', 'mkdir:workspace']);
-    grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projecturl', 'mkdir:projectworkspace', 'shell:createproject', 'copy:strippedframework']);
-    // TODO: The template strings do not replace the file contents. 
+    grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projecturl', 'mkdir:projectworkspace', 'initproject', 'copy:strippedframework']);
     grunt.registerTask('create-vis-config', ['prompt:projectname', 'prompt:visualizationname', 'prompt:visualizationalias', 'copy:vistemplate']);
     grunt.registerTask('build-project-full', ['prompt:projectname', 'prompt:projecturl', 'prompt:pluginsurl', 'build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
     grunt.registerTask('build-project', ['prompt:projectname', 'copy:framework', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
     grunt.registerTask('webserver', ['web_server', 'open:deploy']);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function createPromptTasks() {
+//     var prompts = [
+//         {
+//             name: 'configdir',
+//             config: 'configdir',
+//             type: 'input',
+//             message: 'Please enter the config file location:'
+//         },
+//         {
+//             name: 'visualizationname',
+//             config: 'visualizationName',
+//             type: 'input',
+//             message: 'Please enter the visualization name (Same as top level folder in repository):'
+//         },
+//         {
+//             name: 'commitid',
+//             config: 'commitID',
+//             type: 'input',
+//             message: 'Please enter the commit id:'
+//         },
+//         {
+//             name: 'visualizationalias',
+//             config: 'visualizationAlias',
+//             type: 'input',
+//             message: 'Please enter the visualization alias (Should be unique to prevent issues):'
+//         },
+//         {
+//             name: 'projectname',
+//             config: 'projectName',
+//             type: 'input',
+//             message: 'Please enter the project name (alias):'
+//         },
+//         {
+//             name: 'baseurl',
+//             config: 'baseURL',
+//             type: 'input',
+//             message: 'Please enter the framework base repo URL:'
+//         },
+//         {
+//             name: 'pluginsurl',
+//             config: 'pluginsURL',
+//             type: 'input',
+//             message: 'Please enter the plugins repo URL:'
+//         },
+//         {
+//             name: 'projecturl',
+//             config: 'projectURL',
+//             type: 'input',
+//             message: 'Please enter the project repo URL:'
+//         }
+//     ]
+//     config.prompt = {};
+//     prompts.forEach(function(d, i) {
+//         config.prompt[d.name] = {
+//             options: {
+//                 questions: [{
+//                     config: d.config,
+//                     type: d.type,
+//                     message: d.message,
+//                     when: function(answers) {
+//                         if (grunt.config.data.configdir) return false;
+//                         return true;
+//                     }
+//                 }],
+//                 then: function() {}
+//             }        
+//         }
+//     });
+// }
