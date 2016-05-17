@@ -42,9 +42,17 @@ app.service('Data', ['$rootScope', '$http', function($rootScope, $http) {
             retrieveData: function(datasource, cb) {
                 if (datasource) {
                     if (verbose) console.log("Getting " + datasource + " data...");
+                    
+                    //TODO: Test. Tried this on an API, denied access due to the wrong headers. But both ends managed to connect. 
+                    var url = "";
+                    if (!this.mapDatasource[datasource]) {
+                        url = datasource;
+                    } else {
+                        url = this.mapDatasource[datasource].url;
+                    }
                     $http({
                         method: 'GET',
-                        url: this.mapDatasource[datasource].url
+                        url: url
                     }).then(function(res) {
                         if (verbose) console.log("Got " + datasource + " data!");
                         cb(res);
