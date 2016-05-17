@@ -275,9 +275,9 @@ module.exports = function(grunt) {
         },
         jsdoc: {
             dist: {
-                src: ['deploy/**/*.js', '!deploy/**/lib/*.js'],
+                src: ['../workspaces/framework/**/*.js', '!../workspaces/framework/**/lib/'],
                 options: {
-                    destination: '../doc',
+                    destination: 'deploy/doc',
                     // template : 'node_modules/ink-docstrap/template',
                     // configure : 'node_modules/ink-docstrap/template/jsdoc.conf.json'
                 }
