@@ -19,6 +19,7 @@ Many web libraries are used to make this project function:
 * [jQuery]
 * [Head.js]
 * [D3js]
+
 ### Installation
 
 First, check out this project. Duh.
