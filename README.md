@@ -8,11 +8,8 @@ Additionally, these visualizations need to be accessed and improved by people wh
 
 We plan to grow our plugin library to cover many standard use cases that can be applied to non-standard needs. This allows us to cut down preliminary development time and spend more time customizing and improving the solution.
 
-### Version
-0.0.0
 ### Technologies
 Many web libraries are used to make this project function:
-
 * [AngularJS]
 * [Twitter Bootstrap]
 * [node.js]
@@ -21,25 +18,22 @@ Many web libraries are used to make this project function:
 * [D3js]
 
 ### Installation
-
-First, check out this project. Duh.
-
-You need npm, grunt, and git installed globally:
-* Git can be installed from: https://git-scm.com/download/win
-* NPM can be installed from: https://docs.npmjs.com/getting-started/installing-node
-* Grunt can be installed with NPM: 
+* Clone this project
+* You need npm, grunt, and git installed globally:
+   * Git can be installed from: https://git-scm.com/download/win
+   * NPM can be installed from: https://docs.npmjs.com/getting-started/installing-node
+   * Grunt can be installed with NPM: 
 ```sh
 > npm install grunt
 ```
-   
 * After grunt, npm, and git have been installed and added to your system's path:
-* Open a command prompt/terminal 
-* Navigate to the project directory (which include Gruntfile.js)
-* in your prompt, enter:
+   * Open a command prompt/terminal 
+   * Navigate to the project directory (which include Gruntfile.js)
+   * in your prompt, enter:
 ```sh
 > grunt sometask --arg1=Opt1
 ```
-* Grunt will notify you of any missing dependencies or errors parsing the scripts. 
+* Grunt will notify you of any missing dependencies or errors parsing the scripts
 * To install dependencies from the Grunt package.json file, run the following command:
 ```sh
 > npm install --save
@@ -47,17 +41,7 @@ You need npm, grunt, and git installed globally:
 * To update the Grunt package.json file, run the following command:
 ```sh
 > npm update --save
-```        
-
-The following code is used to access a simple UI for running pre-bundled grunt tasks. Enter this in your prompt, and follow the instructions given.
-```sh
-> grunt prompt
 ```
-
-
-
-
-
 
 ### Development
 
