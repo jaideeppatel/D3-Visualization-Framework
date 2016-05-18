@@ -28,27 +28,26 @@ You need npm, grunt, and git installed globally:
 * Git can be installed from: https://git-scm.com/download/win
 * NPM can be installed from: https://docs.npmjs.com/getting-started/installing-node
 * Grunt can be installed with NPM: 
-*  ```sh
-   > npm install grunt
-   ```
-
-After grunt, npm, and git have been installed and added to your system's path:
-
+```sh
+> npm install grunt
+```
+   
+* After grunt, npm, and git have been installed and added to your system's path:
 * Open a command prompt/terminal 
 * Navigate to the project directory (which include Gruntfile.js)
 * in your prompt, enter:
-*  ```sh
-   > grunt sometask --arg1=Opt1
-   ```
+```sh
+> grunt sometask --arg1=Opt1
+```
 * Grunt will notify you of any missing dependencies or errors parsing the scripts. 
-    *   To install dependencies from the Grunt package.json file, run the following command:
-    *  ```sh
-        > npm install --save
-        ```   
-    * To update the Grunt package.json file, run the following command:
-    * ```sh
-        > npm update --save
-        ```        
+* To install dependencies from the Grunt package.json file, run the following command:
+```sh
+> npm install --save
+```
+* To update the Grunt package.json file, run the following command:
+```sh
+> npm update --save
+```        
 
 The following code is used to access a simple UI for running pre-bundled grunt tasks. Enter this in your prompt, and follow the instructions given.
 ```sh
