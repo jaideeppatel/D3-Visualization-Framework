@@ -1,4 +1,16 @@
 'use strict';
+/**
+ * @namespace grunt
+ * @type {Object}
+ * @description Something
+ */
+/**
+ * @namespace grunt.config
+ * @type {Object}
+ * @description Something
+ */
+
+
 module.exports = function(grunt) {
     require('load-grunt-tasks')(grunt);
 
@@ -15,6 +27,16 @@ module.exports = function(grunt) {
         return object;
     }
 
+    /**
+     * @namespace grunt.config.data
+     * @type {Object}
+     * @description Something
+     */
+
+    /** @global 
+        @memberOf grunt.config.data
+        @description The URL of the Framework repository. 
+    */
     grunt.config.data.baseURL = grunt.option('baseURL')
     grunt.config.data.commitID = grunt.option('visualizationAlias')
     grunt.config.data.pluginsURL = grunt.option('pluginsURL')
@@ -61,7 +83,7 @@ module.exports = function(grunt) {
                 expand: true,
                 cwd: '../workspaces/framework',
                 src: ['**/*', '!lib/*', '!src/*', 'src/tmp/', 'src/DatasourceMap.js'],
-                dest: ('../workspaces/projects/' + '<%= projectName %>' + '/' + '<% visualizationName %>')
+                dest: ('../workspaces/projects/' + '<%= projectName %>' + '/')
             },
             project: {
                 expand: true,
@@ -281,7 +303,15 @@ module.exports = function(grunt) {
                     // template : 'node_modules/ink-docstrap/template',
                     // configure : 'node_modules/ink-docstrap/template/jsdoc.conf.json'
                 }
-            }
+            },
+            grunt: {
+                src: ['Gruntfile.js'],
+                options: {
+                    destination: 'deploy/grunt-doc',
+                    // template : 'node_modules/ink-docstrap/template',
+                    // configure : 'node_modules/ink-docstrap/template/jsdoc.conf.json'
+                }
+            }            
         },
     }
 
@@ -383,7 +413,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build-framework', 'Clean the directory and copy the framework code to the deployment directory.', ['prompt:projectname', 'clean:deploy', 'copy:framework']);
     grunt.registerTask('fetch-project', 'Fetch the project code from the remote repository, read the visIncludes.json file and fetch the corresponding visualizations. ' ['fetch-proj-files', 'fetch-proj-visuals']);
     grunt.registerTask('clean-workspace', 'Cleans the workspace', ['clean:projects', 'clean:visualizations', 'clean:deploys', 'mkdir:workspace']);
-    grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projecturl', 'mkdir:projectworkspace', 'initproject', 'copy:strippedframework']);
+    grunt.registerTask('create-project', ['prompt:projectname', 'prompt:projecturl', 'mkdir:projectworkspace', 'copy:strippedframework']);
     grunt.registerTask('create-vis-config', ['prompt:projectname', 'prompt:visualizationname', 'prompt:visualizationalias', 'copy:vistemplate']);
     grunt.registerTask('build-project-full', ['prompt:projectname', 'prompt:projecturl', 'prompt:pluginsurl', 'build-framework', 'fetch-proj-files', 'fetch-proj-visuals', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
     grunt.registerTask('build-project', ['prompt:projectname', 'copy:framework', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
@@ -392,26 +422,23 @@ module.exports = function(grunt) {
 
 
 
+//build-project
+/*
+st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+scd=>operation: set-config-dir
+cond=>condition: config-dir arg set?
+io=>inputoutput: set object attrs to grunt options
+ppn=>inputoutput: prompt:projectName
+cp=>operation: copy:framework to /deploy
+cp1=>operation: copy:project to /deploy
+cp2=>operation: copy:visualizations to /deploy
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+st->scd->cond
+cond(yes)->io->cp
+cond(no)->ppn(right)->cp
+cp->cp1->cp2->e
+*/
 // function createPromptTasks() {
 //     var prompts = [
 //         {
