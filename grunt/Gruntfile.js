@@ -33,21 +33,55 @@ module.exports = function(grunt) {
      * @description Something
      */
 
-    /** @global 
+    /** 
         @memberOf grunt.config.data
-        @description The URL of the Framework repository. 
+        @description The URL of the working Framework repository for various build tasks.
     */
     grunt.config.data.baseURL = grunt.option('baseURL')
-    grunt.config.data.commitID = grunt.option('visualizationAlias')
+    /** 
+        @memberOf grunt.config.data
+        @description A commit ID for various Git related tasks. 
+    */
+    grunt.config.data.commitID = grunt.option('commitID')
+    /** 
+        @memberOf grunt.config.data
+        @description The URL of the working Plugins repository for various build tasks. 
+    */
     grunt.config.data.pluginsURL = grunt.option('pluginsURL')
+    /**  
+        @memberOf grunt.config.data
+        @description An alias name for a  project that is used to reference a specific project and name workspace/deployment directories.
+    */    
     grunt.config.data.projectName = grunt.option('projectName')
+    /** 
+        @memberOf grunt.config.data
+        @description The URL of the working Projects directory for various build tasks.
+    */        
     grunt.config.data.projectURL = grunt.option('projectURL')
+    /** 
+        @memberOf grunt.config.data
+        @description An alias for a visualization. This is for instanced visulizations. This value should be unique among other visualization names in the working project. 
+    */        
     grunt.config.data.visualizationAlias = grunt.option('visualizationAlias')
+    /** 
+        @memberOf grunt.config.data
+        @description Reference to the visualization name. Same as the directory name in the Plugins repository.
+    */        
     grunt.config.data.visualizationName = grunt.option('visualizationName')
 
     var path = require('path');
+	/**
+	 * @namespace gruntconfig
+	 * @type {Object}
+	 * @description Object containing all registered Grunt task configs.
+	 */    
     var config = {
         pkg: grunt.file.readJSON('package.json'),
+		/**
+         * @memberOf gruntconfig
+		 * @type {Object}
+		 * @description Starts a localhost web server.
+		 */         
         web_server: {
             options: {
                 cors: true,
@@ -59,7 +93,17 @@ module.exports = function(grunt) {
             foo: 'bar' // For some reason an extra key with a non-object value is necessary 
         },
         shell: {},
-        // Deletes specified folders.
+        /**
+         * @memberOf gruntconfig
+		 * @type {Object}
+		 * @property {Array} deploys Cleans the entire deployment directory.
+		 * @property {Array} deploy Cleans the deploy/{@link grunt.config.data.projectName} directory.
+		 * @property {Array} projects Cleans the entire ../workspaces/projects directory.
+		 * @property {Array} project Cleans the ../workspaces/projects/{@link grunt.config.data.projectName} directory.
+		 * @property {Array} visualizations Cleans the entire ../workspaces/visualizations directory.
+		 * @property {Array} visualization Cleans the ../workspaces/visualizations/{@link grunt.config.data.projectName} directory.
+		 * @description Removes specified directory and all contents of that directory. If the {@link web_server} task is running or if the files are in use, this task will fail.
+		 */  
         clean: {
             deploys: ['deploy/'],
             deploy: [('deploy/' + '<%= projectName %>')],
@@ -71,7 +115,19 @@ module.exports = function(grunt) {
                 force: true
             }
         },
-        //Copies src directory to dest
+        /**
+         * @memberOf gruntconfig
+		 * @type {Object}
+		 * @description Copies directories or files from the src directory to the dest directory.
+ 		 * @property {Object} framework Copies ../workspaces/framework to deploy/{@link grunt.config.data.projectName}. Used for project deployment. 
+ 		 * @property {Object} strippedframework Same as the framework task, but excludes certain directories to give a more pure copy. Used to create new projects with the framework's template.
+ 		 * @property {Object} project Copies ../workspaces/projects/{@link grunt.config.data.projectName} to /deploy. Used to deploy projects.
+ 		 * @property {Object} visualizations Copies ../workspaces/visualizations/{@link grunt.config.data.projectName} to /deploy. Used to deploy projects. Excludes extraneous files.
+ 		 * @property {Object} vistemplate Copies ../templates/generatedVisContent to ../workspaces/projects/{@link grunt.config.data.projectName}/visuals. Replaces string placeholders with {@link grunt.config.data.projectName}, {@link grunt.config.data.visualizationAlias}, and {@link grunt.config.data.visualizationName} respectively.
+ 		 * @property {Object} watchcopyproject Same as the copy project task, but used for the watch task.
+ 		 * @property {Object} watchcopyframework Same as the copy framework task, but used for the watch task.
+ 		 * @property {Object} watchcopyvisualizations Same as the copy visualizations task, but used for the watch task.
+		 */  
         copy: {
             framework: {
                 expand: true,
@@ -122,7 +178,6 @@ module.exports = function(grunt) {
                 },
                 flatten: true
             },
-            //Runs copy tasks 
             watchcopyproject: {
                 expand: true,
                 dot: true,
@@ -146,8 +201,12 @@ module.exports = function(grunt) {
                 dest: ('deploy/' + '<%= projectName %>' + '/visuals'),
             }
         },
-        //Watches specified folders and run tasks when a file is changed.
-        //Newer is a task that compares timestamps of two compared files and runs tasks if the compared file is
+        /**
+         * @memberOf gruntconfig
+		 * @type {Object}
+		 * @description Watches specified directory. If changes are made, the grunt newer task is ran, which compares the src and dest directories. If the changed file is newer than the same version in dest, it will run the attached tasks.
+ 		 * @property {Object} project Runs the watchcopyframework, watchcopyproject, watchcopyvisualizations
+		 */          
         watch: {
             project: {
                 files: ['framework/**/*.*', 'projects/**/*.*', 'visualizations/**/*.*'],
@@ -327,6 +386,19 @@ module.exports = function(grunt) {
     });
     grunt.initConfig(config);
     var shell = require('shelljs');
+
+	/**
+	 * @namespace tasks
+	 * @type {Object}
+	 * @description Predefined workflows for basic development, deployment, and build tasks. 
+	 */
+
+	/**
+	 * @namespace set-config-file
+	 * @memberOf  tasks
+	 * @type {Task}
+	 * @description If the config-dir argument has been set and points to a JSON object file, the keys of the JSON object will be set as options, and their values associated. This allows the user to write the options once and use them every time a task runs adding only one argument, as opposed to 6+.
+	 */
     grunt.registerTask('set-config-file', function() {
         if (grunt.option('config-dir')) {
             var obj = grunt.file.readJSON(grunt.option('config-dir'));
@@ -335,6 +407,13 @@ module.exports = function(grunt) {
             })
         }
     });
+
+	/**
+	 * @namespace build-project-visualizations
+	 * @memberOf  tasks
+	 * @type {Task}
+	 * @description Reads the ../workspaces/projects/{@link grunt.config.data.projectName}/visuals/visincludes.json file. Creates a ../workspaces/visualizations/{@link grunt.config.data.projectName} directory. For each of the listed visualizations in the visincludes file, perform a sparseCheckout of the {@link grunt.config.data.pluginsURL} repository.
+	 */    
     grunt.registerTask('build-project-visualizations', function() {
         var projectName = grunt.template.process('<%= projectName %>');
         var pluginsURL = grunt.template.process('<%= pluginsURL %>');
@@ -367,6 +446,13 @@ module.exports = function(grunt) {
 
         });
     });
+
+	/**
+	 * @namespace create-visualization
+	 * @memberOf  tasks
+	 * @type {Task}
+	 * @description Creates ../workspaces/visualizations/{@link grunt.config.data.projectName} and ../workspaces/visualizations/{@link grunt.config.data.projectName}/{@link grunt.config.data.visualizationName} and hooks up the remote repository. 
+	 */    
     grunt.registerTask('create-visualization', function() {
         var projectName = grunt.template.process('<%= projectName %>');
         var pluginsURL = grunt.template.process('<%= pluginsURL %>');
@@ -383,14 +469,13 @@ module.exports = function(grunt) {
             'git reset --hard FETCH_HEAD'
         ].join('&&'));
     });
-    //Creates a directory with the name of the 'project' parameter
-    //Moves into the new directory
-    //Creates a git project
-    //Enables and configures sparseCheckout
-    //Adds the 'project' parameter to the sparseCheckout (so we only check out the right project).
-    //Adds the remote repository
-    //Fetches and resets the remote repository
     grunt.task.run(['set-config-file']);
+	/**
+	 * @namespace initproject
+	 * @memberOf  tasks
+	 * @type {Task}
+	 * @description Creates ../workspaces/visualizations/{@link grunt.config.data.projectName}
+	 */        
     grunt.registerTask('initproject', function() {
         var projectName = grunt.template.process('<%= projectName %>');
         var projectURL = grunt.template.process('<%= projectURL %>');
@@ -403,9 +488,28 @@ module.exports = function(grunt) {
             'git reset --hard FETCH_HEAD'
         ].join('&&'));
     });
+
     grunt.registerTask('register-deploy-scripts', [ /*'folder_list'*/ ]);
+	/**
+	 * @namespace watch-proj
+	 * @memberOf  tasks
+	 * @type {Task}
+	 * @description Runs the {@link gruntconfig.watch} task on the project directory
+	 */  
     grunt.registerTask('watch-proj', ['watch:project']);
+	/**
+	 * @namespace watch-vis
+	 * @memberOf  tasks
+	 * @type {Task}
+	 * @description Runs the {@link gruntconfig.watch} task on the visualizations directory directory
+	 */
     grunt.registerTask('watch-vis', ['watch:visualizations']);
+    /**
+	 * @namespace build-project-files
+	 * @memberOf  tasks
+	 * @type {Task}
+	 * @description Create a project by creating a workspace based on the {@link grunt.config.data.projectName} argument. Runs the {@link gruntconfig.mkdir} task on the projects directory and creates the project with {@link tasks.initproject}.
+	 */
     grunt.registerTask('build-project-files', ['mkdir:projectworkspace', 'initproject']);
     grunt.registerTask('create-project-visualization', ['prompt:projectname', 'prompt:pluginsurl', 'prompt:visualizationname', 'create-visualization'])
     grunt.registerTask('fetch-proj-files', ['prompt:projectname', 'prompt:projecturl', 'clean:project', 'mkdir:projectworkspace', 'build-project-files']);
@@ -419,92 +523,3 @@ module.exports = function(grunt) {
     grunt.registerTask('build-project', ['prompt:projectname', 'copy:framework', 'copy:project', 'copy:visualizations', 'register-deploy-scripts']);
     grunt.registerTask('webserver', ['web_server', 'open:deploy']);
 };
-
-
-
-//build-project
-/*
-st=>start: Start:>http://www.google.com[blank]
-e=>end:>http://www.google.com
-scd=>operation: set-config-dir
-cond=>condition: config-dir arg set?
-io=>inputoutput: set object attrs to grunt options
-ppn=>inputoutput: prompt:projectName
-cp=>operation: copy:framework to /deploy
-cp1=>operation: copy:project to /deploy
-cp2=>operation: copy:visualizations to /deploy
-
-st->scd->cond
-cond(yes)->io->cp
-cond(no)->ppn(right)->cp
-cp->cp1->cp2->e
-*/
-// function createPromptTasks() {
-//     var prompts = [
-//         {
-//             name: 'configdir',
-//             config: 'configdir',
-//             type: 'input',
-//             message: 'Please enter the config file location:'
-//         },
-//         {
-//             name: 'visualizationname',
-//             config: 'visualizationName',
-//             type: 'input',
-//             message: 'Please enter the visualization name (Same as top level folder in repository):'
-//         },
-//         {
-//             name: 'commitid',
-//             config: 'commitID',
-//             type: 'input',
-//             message: 'Please enter the commit id:'
-//         },
-//         {
-//             name: 'visualizationalias',
-//             config: 'visualizationAlias',
-//             type: 'input',
-//             message: 'Please enter the visualization alias (Should be unique to prevent issues):'
-//         },
-//         {
-//             name: 'projectname',
-//             config: 'projectName',
-//             type: 'input',
-//             message: 'Please enter the project name (alias):'
-//         },
-//         {
-//             name: 'baseurl',
-//             config: 'baseURL',
-//             type: 'input',
-//             message: 'Please enter the framework base repo URL:'
-//         },
-//         {
-//             name: 'pluginsurl',
-//             config: 'pluginsURL',
-//             type: 'input',
-//             message: 'Please enter the plugins repo URL:'
-//         },
-//         {
-//             name: 'projecturl',
-//             config: 'projectURL',
-//             type: 'input',
-//             message: 'Please enter the project repo URL:'
-//         }
-//     ]
-//     config.prompt = {};
-//     prompts.forEach(function(d, i) {
-//         config.prompt[d.name] = {
-//             options: {
-//                 questions: [{
-//                     config: d.config,
-//                     type: d.type,
-//                     message: d.message,
-//                     when: function(answers) {
-//                         if (grunt.config.data.configdir) return false;
-//                         return true;
-//                     }
-//                 }],
-//                 then: function() {}
-//             }        
-//         }
-//     });
-// }
