@@ -4,12 +4,11 @@
     "Adam Simpson <adhsimps@indiana.edu>"
   ],
   "description": "Web Visualization Framework.",
-  "main": "",
+  "main": "**",
   "license": "MIT",
   "homepage": "cns.iu.edu",
   "private": true,
   "ignore": [
-    "**/.*",
     "node_modules",
     "bower_components",
     "test",
