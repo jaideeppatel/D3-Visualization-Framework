@@ -383,7 +383,7 @@ var VisualizationClass = function() {
 			try {
 				//TODO: Need to remove Leaflet somehow. 
 				that.SVG.selectAll("*").remove();
-				// $(this.AngularArgs.element[0]).empty()
+				$(this.AngularArgs.element[0]).empty()
 				// this.AngularArgs.element[0].innerHTML = "";
 
 			} catch (exception) {

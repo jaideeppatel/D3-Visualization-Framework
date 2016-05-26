@@ -1,0 +1,26 @@
+{
+  "name": "CNS-WVF",
+  "authors": [
+    "Adam Simpson <adhsimps@indiana.edu>"
+  ],
+  "description": "Web Visualization Framework.",
+  "main": "",
+  "license": "MIT",
+  "homepage": "cns.iu.edu",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "headjs": "^1.0.3",
+    "angular": "^1.5.5",
+    "bootstrap": "^3.3.6",
+    "d3": "^3.5.17",
+    "immutable": "^3.8.1",
+    "jquery": "^2.2.4"
+  }
+}
