@@ -4,11 +4,6 @@
     "Adam Simpson <adhsimps@indiana.edu>"
   ],
   "description": "Web Visualization Framework.",
-  "install": {
-    "path": "grunt",
-    "path": "templates",
-    "path": "workspaces"
-  },
   "license": "MIT",
   "homepage": "cns.iu.edu",
   "private": true,
