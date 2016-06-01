@@ -1,5 +1,5 @@
 # CNS-Frontend-Visualization-Framework
-This framework contains a set of workflows, configurations, and tools to simplify web visualization creation and customization for CNS projects. This was made primarily for [D3js] visualizations, but can be used to create non-[D3js] visualizations with minimal modification. This framework is used in conjunction with the plugin repository (TODO: Link here). 
+This framework contains a set of workflows, configurations, and tools to simplify web visualization creation and customization for CNS projects. This was made primarily for [D3js] visualizations, but can be used to create non-[D3js] visualizations with minimal modification. This framework is used in conjunction with the plugin repository found [here](https://github.iu.edu/CNS/CNS-WVF-Plugins). 
 
 ## Goal
 Web visualization projects use quite a bit of similar code, and it can get pretty messy. Often these visualizations do not need to be completely rewritten for each application, but without a framework, it is easy to lock down the code for the particular application. This framework with the plugins provide generalized underlying visualizations that have methods to add layers of customization and standard methods to create.
