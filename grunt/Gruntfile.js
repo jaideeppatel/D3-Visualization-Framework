@@ -77,6 +77,7 @@ module.exports = function(grunt) {
         'prompt:projectname',
         'prompt:visualizationname',
         'prompt:visualizationalias',
+        'prompt:pluginsurl',
         'prompt:commitid',
         'include-visualization-sub',
         'mkdir:projectvisualization',

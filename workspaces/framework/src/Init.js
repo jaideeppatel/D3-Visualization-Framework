@@ -69,8 +69,6 @@ var verbose = false;
     }, {
         "d3.v3.min.js": "lib/d3.v3.min.js"
     }, {
-        "datatables.min.js": "lib/datatables.min.js"
-    }, {
         "head.js": "lib/head.js"
     }, {
         "immutable.js": "lib/immutable.js"
@@ -81,45 +79,14 @@ var verbose = false;
     }, {
         "json2.js": "lib/json2.js"
     }, {
-        "leaflet-src.js": "lib/leaflet-src.js"
-    }, {
-        "leaflet.js": "lib/leaflet.js"
-    }, {
-        "smart-table.min.js": "lib/smart-table.min.js"
-    }, {
         "DatasourceMap.js": "src/DatasourceMap.js"
     }, {
         "Utilities.js": "src/Utilities.js"
     }, {
         "Visualization.js": "src/Visualization.js"
     }, {
-        "AngularTable.js": "visuals/AngularTable/AngularTable/AngularTable.js"
-    }, {
-        "angularTables-configs.js": "visuals/angularTables-configs.js"
-    }, {
-        "ProportionalSymbol.js": "visuals/ProportionalSymbol/ProportionalSymbol/ProportionalSymbol.js"
-    }, {
-        "proportionalSymbol01-configs.js": "visuals/proportionalSymbol01-configs.js"
-    }, {
-        "BarGraphDistort.js": "visuals/BarGraphDistort/BarGraphDistort/BarGraphDistort.js"
-    }, {
-        "barGraphDistort01-configs.js": "visuals/barGraphDistort01-configs.js"
-    }, {
-        "tableController.js": "visuals/AngularTable/AngularTable/tableController.js"
-    }, {
-        "underlyingStateData.js": "visuals/ProportionalSymbol/ProportionalSymbol/underlyingStateData.js"
-    }, {
-        "tmp/includes.json": "src/tmp/includes.json"
-    }, {
-        "leaflet.css": "css/leaflet.css"
-    }, {
-        "style-main.css": "css/style-main.css"
-    }, {
         "style.css": "css/style.css"
-    },
-    // {
-    //     "less.js": "lib/less.js"
-    // }, 
+    }, 
     {
         "angular-route.js": "lib/angular-route.js"
     });
