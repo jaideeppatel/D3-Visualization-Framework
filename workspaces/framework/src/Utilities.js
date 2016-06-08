@@ -55,7 +55,7 @@ var Utilities = {
 
             origin = [originArr[0], originArr[1]]
             end = [endArr[0], endArr[1]]
-            var offset = 50;
+            var offset = 25;
             if (xorientation == "top") {
                 origin[1] += offset;
             }
@@ -69,7 +69,7 @@ var Utilities = {
                 end[0] -= offset
             }
             if (xtitleorientation == "top") {
-                // origin[1] += offset * 1;
+                origin[1] += offset;
                 chartXText.attr("transform", "translate(" + (width / 2 + originArr[0]) + ", " + ((offset / 2) + originArr[1]) + ")")
             }
             if (xtitleorientation == "bottom") {

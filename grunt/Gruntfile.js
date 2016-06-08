@@ -252,7 +252,7 @@ module.exports = function(grunt) {
         'copy:framework',
         'copy:project',
         'copy:visualizations',
-        'register-deploy-scripts'
+        // 'register-deploy-scripts'
     ]);
     grunt.registerTask('webserver', [
         'web_server',
