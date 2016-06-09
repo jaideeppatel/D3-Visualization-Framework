@@ -57,9 +57,11 @@ var Utilities = {
             end = [endArr[0], endArr[1]]
             var offset = 25;
             if (xorientation == "top") {
+                end[0] -= offset;
                 origin[1] += offset;
             }
             if (xorientation == "bottom") {
+                end[0] -= offset;
                 end[1] -= offset;
             }
             if (yorientation == "left") {
@@ -77,7 +79,7 @@ var Utilities = {
                 chartXText.attr("transform", "translate(" + (width / 2 + originArr[0]) + ", " + ((height + originArr[1]) - (offset / 2)) + ")")
             }
             if (ytitleorientation == "left") {
-                origin[0] += offset
+                origin[0] += offset * 2.5
                 chartYText.attr("transform", "rotate(270)translate(" + (-height / 2 - originArr[1]) + ", " + ((offset / 2) + originArr[1]) + ")")
             }
             if (ytitleorientation == "right") {
