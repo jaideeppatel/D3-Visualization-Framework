@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
     return {
         dist: {
-            src: [grunt.dirs.workspacesframework + '**/*.js', '!' + grunt.dirs.workspacesvisualizations + '**/lib/'],
+            src: [grunt.dirs.workspacesframework + '**/*.js', '!' + grunt.dirs.workspacesframework + '**/lib/', grunt.dirs.workspacesvisualizations + '**/*.js', grunt.dirs.workspacesprojects + '**/*.js'],
             options: {
                 destination: grunt.dirs.deploy + 'doc',
                 // template : 'node_modules/ink-docstrap/template',

@@ -8,19 +8,70 @@
 
 var Utilities = {
 
-
+    /**
+     * @namespace chartArea
+     * @description D3 layout to provide configurable axes and chart areas with only a few parameters. Allows chart visualizations to be uniform, but highly customizable. 
+     */
     chartArea: function() {
+        /**
+         * @memberOf chartArea
+         * @description Visualization instance
+         */
         var network;
+        /**
+         * @memberOf chartArea
+         * @description D3 selector. Used to attach the chart components to. 
+         */
         var selector;
+        /**
+         * @memberOf chartArea
+         * @description Display string for the X Axis
+         */
         var xtitle = "X-Axis Title";
+        /**
+         * @memberOf chartArea
+         * @description Display string for the Y Axis
+         */
         var ytitle = "Y-Axis Title";
+        /**
+         * @memberOf chartArea
+         * @description bottom or top. Changes the origin point of the graph. A bar chart with this value set to bottom will display all bars starting at the bottom of the chart area, extending upwards. A bar chart with this value set to top will display all bars starting at the top of the chart area, extending downwards. 
+         */
         var xorientation = "bottom";
+        /**
+         * @memberOf chartArea
+         * @description bottom or top. Changes the location of the X Axis title. 
+         */
         var xtitleorientation = "top";
+        /**
+         * @memberOf chartArea
+         * @description left or right. Changes the origin point of the graph. A bar chart with this value set to left will display all bars starting at the left of the chart area, extending to the right. A bar chart with this value set to right will display all bars starting at the right of the chart area, extending to the left. 
+         */
         var yorientation = "left";
+        /**
+         * @memberOf chartArea
+         * @description left or right. Changes the location of the Y Axis title.
+         */
         var ytitleorientation = "right";
+        /**
+         * @memberOf chartArea
+         * @description Scale used to create and render the X Axis. Returns a modified version of the input scale where the range has been modified to fit the chart's layout. 
+         */
         var xscale = d3.scale.linear();
+        /**
+         * @memberOf chartArea
+         * @description Scale used to create and render the Y Axis. Returns a modified version of the input scale where the range has been modified to fit the chart's layout. 
+         */
         var yscale = d3.scale.linear();
+        /**
+         * @memberOf chartArea
+         * @description [x, y] coordinates of the start of the graph. Can be used to create partial chart areas on a visualization. Allows for user-defined offsetting and exceptions.
+         */
         var originArr = [0, 0];
+        /**
+         * @memberOf chartArea
+         * @description [x, y] coordinates of the end of the graph. Can be used to create partial chart areas on a visualization. Allows for user-defined offsetting and exceptions.
+         */
         var endArr = [0, 0];
         var xorigin = [0, 0];
         var yorigin = [0, 0];
@@ -258,6 +309,14 @@ var Utilities = {
         var parts = reg.exec(d);
         return parts ? (new Date(Date.UTC(parts[1], parts[2] - 1, parts[3], parts[4], parts[5], parts[6]))) : null;
     },
+    /**
+     * @memberOf Utilities
+     * @function removeCharactersFromString
+     * @description Removes all non-numeric characters from a string.
+     * @param {String} str String to clean.
+     * @returns {Number} Extracted number.
+     */
+
     removeCharactersFromString: function(str) {
         return parseInt(str.replace(/\D/g, ''));
     },

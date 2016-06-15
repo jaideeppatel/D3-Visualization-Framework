@@ -1,5 +1,5 @@
 /**
- * @namespace  VisualizationClass
+ * @class  VisualizationClass
  * @type {Object}
  * @description Provides tools to visualization plugins. 
  */

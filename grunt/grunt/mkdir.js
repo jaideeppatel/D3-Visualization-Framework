@@ -22,7 +22,7 @@ module.exports = function(grunt) {
         },
         projectvisualization: {
             options: {
-                create: [grunt.dirs.workspacesvisualizations + '<%= projectName %>' + '/' + '<%= projectName %>' + '/' + '<%= visualizationName %>']
+                create: [grunt.dirs.workspacesvisualizations + '<%= projectName %>' + '/' + '<%= visualizationName %>']
             }
         }
     }
