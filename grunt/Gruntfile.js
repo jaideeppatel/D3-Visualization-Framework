@@ -258,6 +258,11 @@ module.exports = function(grunt) {
         'web_server',
         'open:deploy'
     ]);
+
+    grunt.registerTask('connect-proj', [
+        'prompt:projectname',
+        'connect:server',
+        'watch-proj'])
 };
 
 
