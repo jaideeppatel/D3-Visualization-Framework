@@ -1,3 +1,3 @@
 configs.VISALIAS = {};
-events.VISALIAS = function(){};
-dataprep.VISALIAS = function(){};
+events.VISALIAS = function(ntwrk){};
+dataprep.VISALIAS = function(ntwrk){};
