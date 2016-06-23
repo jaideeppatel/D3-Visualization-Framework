@@ -4,7 +4,7 @@
  * @description Angular app. Binds events to Angular DOM elements. 
  */
 var app = angular.module('app', [])
-
+var verbose = true;
 app.service('Data', ['$rootScope', '$http', function($rootScope, $http) {
     /**
      * @memberOf  app
