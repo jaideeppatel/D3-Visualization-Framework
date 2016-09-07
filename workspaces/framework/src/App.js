@@ -4,9 +4,10 @@
  * @description Angular app. Binds events to Angular DOM elements. 
  */
 var app = angular.module('app', [])
-var verbose = true;
+
 app.service('Data', ['$rootScope', '$http', function($rootScope, $http) {
     /**
+     * @namespace  service
      * @memberOf  app
      * @description Angular service. Provides global data binding tools.
      * @property mapDatasource {@link globalDatasourceMap}
@@ -16,11 +17,10 @@ app.service('Data', ['$rootScope', '$http', function($rootScope, $http) {
      * @property {Function} getData {@link app.getData}
      * @property {Function} getAllData {@link app.getAllData}
      */
-    
-
     var service = {
             mapDatasource: globalDatasourceMap,
             dataQueue: [],
+            //TODO: Test this
             /**
              * @memberOf app
              * @function addToDataQueue

@@ -102,6 +102,7 @@ var VisualizationClass = function() {
          */
         this.Verbose = verbose || false,
 
+
         /**
          * @memberOf VisualizationClass
          * @type Function
@@ -149,6 +150,10 @@ var VisualizationClass = function() {
                             .attr("height", args.height || out.dims.height)
 
                     }
+
+                    if (args.noG) {
+                        return that.SVGBase
+                    }
                     return that.SVGBase.append("g")
                 }
                 /**
@@ -160,7 +165,7 @@ var VisualizationClass = function() {
                  */
             out.easyGraphLayout = function(network, opts) {
                     network.SVG.graphOpts = {};
-                    var defaultMargin = 50;
+                    var defaultMargin = 20;
                     network.SVG.graphOpts.margins = {
                         top: network.config.margins.top || defaultMargin,
                         left: network.config.margins.left || defaultMargin,
@@ -180,105 +185,105 @@ var VisualizationClass = function() {
                  * @description  Creates a graph with options. Offsets graph area to allow for axis margins. Adds axis labels. 
                  */
             out.easyGraph = function(network, opts) {
-                    network.Scales.x.range([0, network.SVG.graphOpts.width - 20]);
-                    // network.Scales.y.range([network.SVG.graphOpts.height, 0]);
-                    network.Scales.x1.range([network.SVG.graphOpts.wOffset, network.SVG.graphOpts.width + network.SVG.graphOpts.wOffset])
-                    network.Scales.y1.range([network.SVG.graphOpts.height + network.SVG.graphOpts.hOffset, network.SVG.graphOpts.hOffset])
-                    network.Scales.xAxis = d3.svg.axis()
-                        .scale(opts.x.scale1)
-                        .orient(opts.x.orient || "bottom")
-                        // .tickSize(5);
-                    network.Scales.yAxis = d3.svg.axis()
-                        .scale(opts.y.scale1)
-                        .tickSize(network.SVG.graphOpts.width)
-                        .orient(opts.y.orient || "left");
+                network.Scales.x.range([0, network.SVG.graphOpts.width - 20]);
+                // network.Scales.y.range([network.SVG.graphOpts.height, 0]);
+                network.Scales.x1.range([network.SVG.graphOpts.wOffset, network.SVG.graphOpts.width + network.SVG.graphOpts.wOffset])
+                network.Scales.y1.range([network.SVG.graphOpts.height + network.SVG.graphOpts.hOffset, network.SVG.graphOpts.hOffset])
+                network.Scales.xAxis = d3.svg.axis()
+                    .scale(opts.x.scale1)
+                    .orient(opts.x.orient || "bottom")
+                    // .tickSize(5);
+                network.Scales.yAxis = d3.svg.axis()
+                    .scale(opts.y.scale1)
+                    .tickSize(network.SVG.graphOpts.width)
+                    .orient(opts.y.orient || "left");
 
-                    if (!network.SVG.graphG) {
-                        network.SVG.graphG = network.SVG.append("g")
-                            .attr("class", "graphG")
-                            .attr("transform", function(d, i) {
-                                return "translate(" + network.SVG.graphOpts.wOffset + "," + network.SVG.graphOpts.hOffset + ")"
-                            });
+                if (!network.SVG.graphG) {
+                    network.SVG.graphG = network.SVG.append("g")
+                        .attr("class", "graphG")
+                        .attr("transform", function(d, i) {
+                            return "translate(" + network.SVG.graphOpts.wOffset + "," + network.SVG.graphOpts.hOffset + ")"
+                        });
 
-                    }
-
-                    // if (network.Scales.x.domain()[0] == network.Scales.x.domain()[1]) {
-                    // 	if (network.Scales.x.domain()[1] >= 0) {
-                    // 		network.Scales.x.domain([0, network.Scales.x.domain()[1]])
-                    // 	}
-                    // }
-
-                    var xAxisTranslate = network.SVG.graphOpts.height;
-                    var yAxisTranslate = network.SVG.graphOpts.width;
-                    var xLabelTranslate = network.SVG.graphOpts.height + network.SVG.graphOpts.hOffset;
-                    var yLabelTranslate = -20;
-                    var tLabelTranslate = -40;
-
-                    if (opts.x.orient == "top") {
-                        xAxisTranslate = 0;
-                        xLabelTranslate = -20;
-                    }
-                    if (opts.y.orient == "right") {
-                        yAxisTranslate = 0;
-                        yLabelTranslate = network.SVG.graphOpts.width + network.SVG.graphOpts.wOffset;
-                    }
-                    if (opts.t.orient == "bottom") tLabelTranslate = network.SVG.graphOpts.height + 40;
-
-                    if (network.SVG.xAxisG) network.SVG.xAxisG.remove()
-                    if (network.SVG.yAxisG) network.SVG.yAxisG.remove()
-                    if (network.SVG.xAxisLabel) network.SVG.xAxisLabel.remove()
-                    if (network.SVG.yAxisLabel) network.SVG.yAxisLabel.remove()
-                    if (network.SVG.title) network.SVG.title.remove()
-
-                    if (!network.SVG.graphArea) {
-                        network.SVG.graphArea = network.SVG.graphG.append("g")
-                            .attr("class", "graphArea")
-                            .attr("transform", "translate(0," + (yAxisTranslate * 2 + 1) + ")")
-                            // network.SVG.graphArea.append("rect")
-                            // 	.attr("width", 20)
-                            // 	.attr("height", 20)
-                    }
-
-                    network.SVG.xAxisG = network.SVG.graphG.append("g")
-                        .attr("class", "x axis")
-                        .attr("transform", "translate(0," + xAxisTranslate + ")")
-                        .call(network.Scales.xAxis);
-
-                    network.SVG.yAxisG = network.SVG.graphG.append("g")
-                        .attr("class", "y axis")
-                        .attr("transform", "translate(" + yAxisTranslate + ",0)")
-                        .call(network.Scales.yAxis);
-
-                    network.SVG.graphG.xAxisLabel = network.SVG.graphG
-                        .append("text")
-                        .attr("class", "l2")
-                        .attr("transform", "translate(" + (network.SVG.graphOpts.width / 2) + "," + xLabelTranslate + ")")
-                        .attr("text-anchor", "middle")
-                        .text(opts.x.label);
-
-                    network.SVG.graphG.yAxisLabel = network.SVG.graphG
-                        .append("text")
-                        .attr("class", "l2")
-                        .attr("transform", "translate(" + yLabelTranslate + "," + (network.SVG.graphOpts.height / 2) + ")rotate(270)")
-                        .attr("text-anchor", "middle")
-                        .text(opts.y.label)
-
-                    network.SVG.graphG.title = network.SVG.graphG
-                        .append("text")
-                        // .attr("class", "l")
-                        .attr("transform", "translate(" + (network.SVG.graphOpts.width / 2) + "," + tLabelTranslate + ")")
-                        .attr("text-anchor", "middle")
-                        .text(opts.t.label)
                 }
 
-                /**
-                 * @memberOf CreateBaseConfig
-                 * @type Function
-                 * @property container Element to append Leaflet map to.
-                 * @property options Leaflet options for map creation.
-                 * @property {String} tileURL URL for Leaflet map tiles. 
-                 * @description  Creates a Leaflet map.
-                 */
+                // if (network.Scales.x.domain()[0] == network.Scales.x.domain()[1]) {
+                //  if (network.Scales.x.domain()[1] >= 0) {
+                //      network.Scales.x.domain([0, network.Scales.x.domain()[1]])
+                //  }
+                // }
+
+                var xAxisTranslate = network.SVG.graphOpts.height;
+                var yAxisTranslate = network.SVG.graphOpts.width;
+                var xLabelTranslate = network.SVG.graphOpts.height + network.SVG.graphOpts.hOffset;
+                var yLabelTranslate = -20;
+                var tLabelTranslate = -40;
+
+                if (opts.x.orient == "top") {
+                    xAxisTranslate = 0;
+                    xLabelTranslate = -20;
+                }
+                if (opts.y.orient == "right") {
+                    yAxisTranslate = 0;
+                    yLabelTranslate = network.SVG.graphOpts.width + network.SVG.graphOpts.wOffset;
+                }
+                if (opts.t.orient == "bottom") tLabelTranslate = network.SVG.graphOpts.height + 40;
+
+                if (network.SVG.xAxisG) network.SVG.xAxisG.remove()
+                if (network.SVG.yAxisG) network.SVG.yAxisG.remove()
+                if (network.SVG.xAxisLabel) network.SVG.xAxisLabel.remove()
+                if (network.SVG.yAxisLabel) network.SVG.yAxisLabel.remove()
+                if (network.SVG.title) network.SVG.title.remove()
+
+                if (!network.SVG.graphArea) {
+                    network.SVG.graphArea = network.SVG.graphG.append("g")
+                        .attr("class", "graphArea")
+                        .attr("transform", "translate(0," + (yAxisTranslate * 2 + 1) + ")")
+                        // network.SVG.graphArea.append("rect")
+                        //  .attr("width", 20)
+                        //  .attr("height", 20)
+                }
+
+                network.SVG.xAxisG = network.SVG.graphG.append("g")
+                    .attr("class", "x wvf-axis")
+                    .attr("transform", "translate(0," + xAxisTranslate + ")")
+                    .call(network.Scales.xAxis);
+
+                network.SVG.yAxisG = network.SVG.graphG.append("g")
+                    .attr("class", "y wvf-axis")
+                    .attr("transform", "translate(" + yAxisTranslate + ",0)")
+                    .call(network.Scales.yAxis);
+
+                network.SVG.graphG.xAxisLabel = network.SVG.graphG
+                    .append("text")
+                    .attr("class", "l2")
+                    .attr("transform", "translate(" + (network.SVG.graphOpts.width / 2) + "," + xLabelTranslate + ")")
+                    .attr("text-anchor", "middle")
+                    .text(opts.x.label);
+
+                network.SVG.graphG.yAxisLabel = network.SVG.graphG
+                    .append("text")
+                    .attr("class", "l2")
+                    .attr("transform", "translate(" + yLabelTranslate + "," + (network.SVG.graphOpts.height / 2) + ")rotate(270)")
+                    .attr("text-anchor", "middle")
+                    .text(opts.y.label)
+
+                network.SVG.graphG.title = network.SVG.graphG
+                    .append("text")
+                    // .attr("class", "l")
+                    .attr("transform", "translate(" + (network.SVG.graphOpts.width / 2) + "," + tLabelTranslate + ")")
+                    .attr("text-anchor", "middle")
+                    .text(opts.t.label)
+            }
+
+            /**
+             * @memberOf CreateBaseConfig
+             * @type Function
+             * @property container Element to append Leaflet map to.
+             * @property options Leaflet options for map creation.
+             * @property {String} tileURL URL for Leaflet map tiles. 
+             * @description  Creates a Leaflet map.
+             */
             out.easyLeafletMap = function(container, options, tileURL) {
                 var obj = new Object();
                 obj.map = L.map(container, options);
@@ -378,16 +383,15 @@ var VisualizationClass = function() {
          * @returns Instance of {@link VisualizationClass}
          * @description  Removes all elements from the base selector.
          */
-        this.ClearVis = function() {
+        this.ClearVis = function(empty) {
             that = this;
+            if (empty) $(this.AngularArgs.element).empty()
+
             try {
                 //TODO: Need to remove Leaflet somehow. 
                 that.SVG.selectAll("*").remove();
-                // $(this.AngularArgs.element[0]).empty()
-                    // this.AngularArgs.element[0].innerHTML = "";
-
             } catch (exception) {
-                // console.log(exception)
+            	// console.log(exception)
             }
             return this;
         },
@@ -398,8 +402,9 @@ var VisualizationClass = function() {
          * @returns Instance of {@link VisualizationClass}
          * @description  Runs {@link this.ClearVis} and {@link this.RunVis}. 
          */
-        this.ResetVis = function() {
-            this.ClearVis();
+        this.ResetVis = function(args) {
+            var args = args || {};
+            this.ClearVis(args.empty);
             this.prepareData();
             this.RunVis();
             return this;
@@ -462,7 +467,7 @@ var VisualizationClass = function() {
             clearTimeout(this.RunVisQueue);
             var that = this;
             this.RunVisQueue = setTimeout(function() {
-                that.ClearVis();
+                that.ClearVis(args.empty);
                 if (that.isFirstRun) {
                     that.prepareData();
                     that.Vis(that.AngularArgs.element, that.AngularArgs.data, that.AngularArgs.opts);
@@ -482,6 +487,7 @@ var VisualizationClass = function() {
                 });
                 that.isFirstRun = false;
             }, 200);
+
             return that;
         },
         /**
